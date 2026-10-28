@@ -393,7 +393,7 @@
     position: relative; padding: .9rem 1rem .95rem 1.1rem; border-radius: 14px;
     background: var(--surface); border: 1px solid var(--line); border-left: 2px solid var(--line-accent);
   }
-  .tip::before { content: '師'; position: absolute; right: .9rem; top: .5rem; font-family: 'Noto Serif SC', serif; font-size: 1.5rem; color: var(--accent); opacity: .14; }
+  .tip::before { content: '师'; position: absolute; right: .9rem; top: .5rem; font-family: 'Noto Serif SC', serif; font-size: 1.5rem; color: var(--accent); opacity: .14; }
   .tip-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .16em; color: var(--accent); margin-bottom: .35rem; }
   .tip p { font-size: 1.12rem; line-height: 1.5; color: var(--text); }
 
@@ -829,7 +829,7 @@ const TEA_DATABASE = [
   {
     id: "lao-sheng",
     name_ru: "Шэн Пуэр (Выдержанный Лао Шэн, 7+ лет)",
-    name_cn: "老生普 (Lǎo Shēng Pǔ)",
+    name_cn: "老生普洱 (Lǎo Shēng Pǔ'ěr)",
     categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
     curve_type: "pressed", temp_c: 96, grams_per_100ml: 6.5,
     needs_rinse: true, rinse_sec: 7, warm_breath_sec: 45,
@@ -840,7 +840,7 @@ const TEA_DATABASE = [
   {
     id: "liu-bao-fu-zhuan",
     name_ru: "Лю Бао / Фу Чжуань (Хэй Ча с «золотыми цветами»)",
-    name_cn: "六堡茶 / 茯砖 (Hēi Chá)",
+    name_cn: "六堡茶 / 茯砖茶 (Liùbǎo Chá / Fúzhuān Chá)",
     categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
     curve_type: "pressed", temp_c: 98, grams_per_100ml: 6.5,
     needs_rinse: true, rinse_sec: 8, warm_breath_sec: 40,
@@ -864,7 +864,7 @@ const TEA_DATABASE = [
   {
     id: "tgy-nong-xiang",
     name_ru: "Те Гуань Инь (Нун Сян — печеный / традиционный)",
-    name_cn: "浓香铁观音 (Nóng Xiāng TGY)",
+    name_cn: "浓香铁观音 (Nóngxiāng Tiě Guānyīn)",
     categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
     curve_type: "rolled", temp_c: 95, grams_per_100ml: 6.0,
     needs_rinse: true, rinse_sec: 7, warm_breath_sec: 40,
@@ -875,7 +875,7 @@ const TEA_DATABASE = [
   {
     id: "gaba-oolong",
     name_ru: "ГАБА Улун (Алишань / Мэйшань)",
-    name_cn: "佳叶龙茶 (GABA Oolong)",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
     curve_type: "rolled", temp_c: 94, grams_per_100ml: 6.0,
     needs_rinse: true, rinse_sec: 6, warm_breath_sec: 35,
@@ -886,7 +886,7 @@ const TEA_DATABASE = [
   {
     id: "dong-ding",
     name_ru: "Дун Дин (Улун с Морозного Пика)",
-    name_cn: "冻顶乌龙 (Dòng Dǐng)",
+    name_cn: "冻顶乌龙 (Dòngdǐng Wūlóng)",
     categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
     curve_type: "rolled", temp_c: 94, grams_per_100ml: 6.0,
     needs_rinse: true, rinse_sec: 6, warm_breath_sec: 35,
@@ -896,8 +896,8 @@ const TEA_DATABASE = [
   },
   {
     id: "alishan-jin-xuan",
-    name_ru: "Алишань Цзинь Сюань (Огненный цветок)",
-    name_cn: "阿里山金萱 (Jīn Xuān)",
+    name_ru: "Алишань Цзинь Сюань (Золотой лилейник)",
+    name_cn: "阿里山金萱 (Ālǐshān Jīnxuān)",
     categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
     curve_type: "rolled", temp_c: 90, grams_per_100ml: 6.0,
     needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
@@ -908,7 +908,7 @@ const TEA_DATABASE = [
   {
     id: "nai-xiang-jin-xuan",
     name_ru: "Най Сян Цзинь Сюань (Молочный улун)",
-    name_cn: "奶香金萱 (Nǎi Xiāng)",
+    name_cn: "奶香金萱 (Nǎixiāng Jīnxuān)",
     categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
     curve_type: "rolled", temp_c: 88, grams_per_100ml: 5.5,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 20,
@@ -932,7 +932,7 @@ const TEA_DATABASE = [
   {
     id: "wuyi-rou-gui",
     name_ru: "Уи Жоу Гуй (Корица с гор Уи)",
-    name_cn: "武夷肉桂 (Ròu Guì)",
+    name_cn: "武夷肉桂 (Wǔyí Ròuguì)",
     categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
     curve_type: "loose", temp_c: 96, grams_per_100ml: 6.0,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 40,
@@ -943,7 +943,7 @@ const TEA_DATABASE = [
   {
     id: "wuyi-shui-xian",
     name_ru: "Уи Шуй Сянь (Водный Бессмертный)",
-    name_cn: "武夷水仙 (Shuǐ Xiān)",
+    name_cn: "武夷水仙 (Wǔyí Shuǐxiān)",
     categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
     curve_type: "loose", temp_c: 95, grams_per_100ml: 6.0,
     needs_rinse: true, rinse_sec: 5, warm_breath_sec: 40,
@@ -954,7 +954,7 @@ const TEA_DATABASE = [
   {
     id: "feng-huang-dan-cong",
     name_ru: "Фэн Хуан Дань Цун (Одиночные кусты с гор Феникса)",
-    name_cn: "凤凰单丛 (Dān Cóng)",
+    name_cn: "凤凰单丛 (Fènghuáng Dāncóng)",
     categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
     curve_type: "loose", temp_c: 90, grams_per_100ml: 5.5,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -978,7 +978,7 @@ const TEA_DATABASE = [
   {
     id: "dian-hong",
     name_ru: "Дянь Хун (Крупнолистовой классический)",
-    name_cn: "滇红工夫 (Diān Hóng)",
+    name_cn: "滇红工夫 (Diānhóng Gōngfu)",
     categoryId: "red_tea", categoryName: "Красный чай",
     curve_type: "loose", temp_c: 90, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 25,
@@ -989,7 +989,7 @@ const TEA_DATABASE = [
   {
     id: "dian-hong-jin-ya",
     name_ru: "Дянь Хун Цзинь Я (Золотые почки Юньнани)",
-    name_cn: "滇红金芽 (Jīn Yá)",
+    name_cn: "滇红金芽 (Diānhóng Jīnyá)",
     categoryId: "red_tea", categoryName: "Красный чай",
     curve_type: "loose", temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 20,
@@ -1011,7 +1011,7 @@ const TEA_DATABASE = [
   {
     id: "zheng-shan-xiao-zhong",
     name_ru: "Чжэн Шань Сяо Чжун (Лапсанг Сушонг)",
-    name_cn: "正山小种 (Xiǎo Zhǒng)",
+    name_cn: "正山小种 (Zhèngshān Xiǎozhǒng)",
     categoryId: "red_tea", categoryName: "Красный чай",
     curve_type: "loose", temp_c: 92, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
@@ -1022,7 +1022,7 @@ const TEA_DATABASE = [
   {
     id: "qimen-hong-cha",
     name_ru: "Ци Мэнь Хун Ча (Кимун)",
-    name_cn: "祁门红茶 (Qímén)",
+    name_cn: "祁门红茶 (Qímén Hóngchá)",
     categoryId: "red_tea", categoryName: "Красный чай",
     curve_type: "loose", temp_c: 90, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 25,
@@ -1033,7 +1033,7 @@ const TEA_DATABASE = [
   {
     id: "hong-yu-18",
     name_ru: "Хун Юй №18 (Рубиновый тайваньский)",
-    name_cn: "红玉十八号 (Ruby #18)",
+    name_cn: "红玉十八号 (Hóngyù Shíbā Hào)",
     categoryId: "red_tea", categoryName: "Красный чай",
     curve_type: "loose", temp_c: 92, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
@@ -1046,7 +1046,7 @@ const TEA_DATABASE = [
   {
     id: "bai-hao-yin-zhen",
     name_ru: "Бай Хао Инь Чжэнь (Серебряные иглы)",
-    name_cn: "白毫银针 (Yín Zhēn)",
+    name_cn: "白毫银针 (Báiháo Yínzhēn)",
     categoryId: "white_tea", categoryName: "Белый чай",
     curve_type: "loose", temp_c: 82, grams_per_100ml: 5.0,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -1092,7 +1092,7 @@ const TEA_DATABASE = [
   {
     id: "xihu-longjing",
     name_ru: "Сиху Лунцзин (Колодец Дракона)",
-    name_cn: "西湖龙井 (Lóngjǐng)",
+    name_cn: "西湖龙井 (Xīhú Lóngjǐng)",
     categoryId: "green_tea", categoryName: "Зеленый чай",
     curve_type: "loose", temp_c: 80, grams_per_100ml: 4.5,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -1103,7 +1103,7 @@ const TEA_DATABASE = [
   {
     id: "dongting-bi-luo-chun",
     name_ru: "Дунтин Би Ло Чунь (Изумрудные спирали весны)",
-    name_cn: "碧螺春 (Bì Luó Chūn)",
+    name_cn: "洞庭碧螺春 (Dòngtíng Bìluóchūn)",
     categoryId: "green_tea", categoryName: "Зеленый чай",
     curve_type: "loose", temp_c: 78, grams_per_100ml: 4.0,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -1125,7 +1125,7 @@ const TEA_DATABASE = [
   {
     id: "taiping-hou-kui",
     name_ru: "Тайпин Хоукуй (Главарь обезьян из Тайпин)",
-    name_cn: "太平猴魁 (Hóu Kuí)",
+    name_cn: "太平猴魁 (Tàipíng Hóukuí)",
     categoryId: "green_tea", categoryName: "Зеленый чай",
     curve_type: "loose", temp_c: 82, grams_per_100ml: 4.5,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -1136,7 +1136,7 @@ const TEA_DATABASE = [
   {
     id: "luan-gua-pian",
     name_ru: "Лю Ань Гуа Пянь (Тыквенные семечки из Люань)",
-    name_cn: "六安瓜片 (Guā Piàn)",
+    name_cn: "六安瓜片 (Lù'ān Guāpiàn)",
     categoryId: "green_tea", categoryName: "Зеленый чай",
     curve_type: "loose", temp_c: 82, grams_per_100ml: 4.5,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -1160,7 +1160,7 @@ const TEA_DATABASE = [
   {
     id: "jun-shan-yin-zhen",
     name_ru: "Цзюнь Шань Инь Чжэнь (Серебряные иглы с гор Цзюньшань)",
-    name_cn: "君山银针 (Jūn Shān Yín Zhēn)",
+    name_cn: "君山银针 (Jūnshān Yínzhēn)",
     categoryId: "yellow_tea", categoryName: "Желтый чай",
     curve_type: "loose", temp_c: 85, grams_per_100ml: 4.5,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -1171,7 +1171,7 @@ const TEA_DATABASE = [
   {
     id: "meng-ding-huang-ya",
     name_ru: "Мэн Дин Хуан Я (Желтые почки с пика Мэндин)",
-    name_cn: "蒙顶黄芽 (Huáng Yá)",
+    name_cn: "蒙顶黄芽 (Méngdǐng Huángyá)",
     categoryId: "yellow_tea", categoryName: "Желтый чай",
     curve_type: "loose", temp_c: 85, grams_per_100ml: 4.5,
     needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
@@ -2589,7 +2589,7 @@ function renderLog() {
   if (!state.log.length) {
     root.innerHTML = `
       <div class="max-w-md mx-auto text-center panel rounded-[24px] p-10">
-        <div class="hz text-6xl accent opacity-70">記</div>
+        <div class="hz text-6xl accent opacity-70">记</div>
         <h2 class="serif text-3xl mt-4">Дневник пока пуст</h2>
         <p class="text-sage mt-2 text-sm">Завершите первую церемонию — здесь появятся оценки, Ча Ци и ваши заметки.</p>
         <button type="button" class="btn-primary mt-6" data-action="tab" data-tab="setup">Выбрать чай</button>
@@ -2610,7 +2610,7 @@ function renderLog() {
 
   root.innerHTML = `
     <div class="max-w-4xl mx-auto">
-      <div class="step-kicker">茶记 · Чай Цзи</div>
+      <div class="step-kicker">茶记 · Чайные записи</div>
       <h2 class="serif text-[2.2rem] leading-tight font-semibold">Чайный дневник</h2>
 
       <div class="log-filters panel" id="log-filters" role="group" aria-label="Фильтры дневника">
