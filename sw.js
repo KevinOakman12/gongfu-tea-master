@@ -1,7 +1,7 @@
-/* Gongfu Tea Master — service worker (офлайн).
+/* 茶道 ChaDao — service worker (офлайн).
    HTML/CSS/манифест: сначала сеть (свежая версия), при её отсутствии — кэш.
    Шрифты и иконки: из кэша. При изменении состава файлов поднимайте VERSION. */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = 'gongfu-' + VERSION;
 const ASSETS = [
   "./",

@@ -4,17 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111714">
-<title>Gongfu Tea Master</title>
-<meta name="description" content="Gongfu Tea Master — помощник гунфу-чаепития: дозировка под посуду, таймер проливов, дневник.">
+<title>茶道 ChaDao — Путь чая</title>
+<meta name="description" content="茶道 ChaDao — Путь чая: помощник чаепития. Дозировка под посуду, таймер проливов, дневник.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Gongfu">
+<meta name="apple-mobile-web-app-title" content="茶道">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="assets/tailwind.css">
 <style>
   /* ═══ Dark Jade & Antique Bronze ═══ */
   :root {
@@ -558,6 +557,16 @@
   .check input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); flex-shrink: 0; }
   .form-error { min-height: 1.3em; font-size: .84rem; color: var(--danger); }
 
+  .icon-btn { flex-shrink: 0; }
+  @media (max-width: 399px) {
+    .seg button { white-space: normal; line-height: 1.2; padding: .4rem .45rem; font-size: .76rem; }
+    .vessel-mat .seg { min-width: 0; }
+  }
+  @media (max-width: 359px) {
+    .tab { padding: .45rem .5rem; font-size: .8rem; }
+    .app-header .hz.text-2xl { font-size: 1.35rem; }
+  }
+
   /* ── Toast ── */
   #toast {
     position: fixed; left: 50%; bottom: calc(1.25rem + env(safe-area-inset-bottom)); z-index: 90;
@@ -585,6 +594,7 @@
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   }
 </style>
+<link rel="stylesheet" href="assets/tailwind.css">
 </head>
 <body class="antialiased">
 
@@ -593,8 +603,8 @@
     <div class="flex items-center gap-3 min-w-0">
       <div class="hz text-2xl accent leading-none" aria-hidden="true">茶</div>
       <div class="hidden md:block leading-tight">
-        <div class="serif text-xl">Gongfu Tea Master</div>
-        <div class="text-[11px] text-dim tracking-[.18em] uppercase">功夫茶 · метод Mei Leaf</div>
+        <div class="serif text-xl"><span class="hz">茶道</span> <span class="text-sage">·</span> ChaDao</div>
+        <div class="text-[11px] text-dim tracking-[.18em] uppercase">Путь чая</div>
       </div>
     </div>
     <nav class="flex items-center gap-1" role="tablist" aria-label="Разделы">
@@ -688,7 +698,7 @@ const CATEGORIES = [
 const CAT = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 
 /* ════════════════════════════════════════════════════════════════════
-   2. БАЗА ДАННЫХ: 36 сортов (калибровка Mei Leaf, 100 мл, фарфор)
+   2. БАЗА ДАННЫХ: 36 сортов (расчёт на 100 мл воды, фарфор)
    ════════════════════════════════════════════════════════════════════ */
 const TEA_DATABASE = [
   /* ── Категория 1: Пуэры и Хэй Ча ── */
@@ -1378,6 +1388,16 @@ function rebuildTeas() {
 }
 rebuildTeas();
 
+/** Читает дневник; повреждённые записи и неверный формат хранилища не должны ломать приложение */
+function loadLog() {
+  const raw = store.get(KEYS.log, []);
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(e => e && typeof e === 'object' && typeof e.id === 'string' && typeof e.teaId === 'string' &&
+                 typeof e.teaName === 'string' && Number.isFinite(e.grams) && Number.isFinite(e.volume) && Array.isArray(e.steepTimes))
+    .map(e => ({ categoryId: '', material: 'porcelain', steepsDone: 0, totalSteeps: e.steepTimes.length, adjustTotal: 0, rating: 0, qi: [], note: '', date: new Date(0).toISOString(), ...e }));
+}
+
 const savedSettings = store.get(KEYS.settings, {});
 const state = {
   screen: 'setup',
@@ -1388,7 +1408,7 @@ const state = {
   curveInfoOpen: false,
   selectedId: TEA_BY_ID[savedSettings.selectedId] ? savedSettings.selectedId : TEAS[0].id,
   session: null,
-  log: store.get(KEYS.log, []),
+  log: loadLog(),
   modal: null
 };
 const sound = new SoundEngine(store.get(KEYS.muted, false));
@@ -1829,7 +1849,8 @@ function persistSession() {
 
 function restoreSession() {
   const d = store.get(KEYS.session, null);
-  if (!d || !TEA_BY_ID[d.teaId] || !Array.isArray(d.steps) || !d.steps.length) return;
+  if (!d || !TEA_BY_ID[d.teaId] || !Array.isArray(d.steps) || !d.steps.length ||
+      !d.steps.every(x => x && ['rinse', 'breath', 'steep'].includes(x.kind) && Number.isFinite(x.sec))) return;
   const idx = Math.min(Math.max(0, d.idx | 0), d.steps.length - 1);
   state.session = {
     ...d, idx,
@@ -2192,9 +2213,9 @@ function updateTitle() {
   if (s && s.running) {
     const step = curStep();
     const label = step.kind === 'steep' ? `Пролив ${step.n}` : step.kind === 'rinse' ? 'Промывка' : 'Прогрев';
-    document.title = `${fmtClock(s.remainingMs)} · ${label} — Gongfu`;
+    document.title = `${fmtClock(s.remainingMs)} · ${label} — 茶道`;
   } else {
-    document.title = 'Gongfu Tea Master';
+    document.title = '茶道 ChaDao';
   }
 }
 
@@ -2437,7 +2458,7 @@ function openTeaEditor(id, catId) {
           <div class="min-w-0">
             <div class="step-kicker">${isNew ? 'Новый сорт' : isCustom ? 'Свой сорт' : 'Параметры сорта'}</div>
             <h3 id="modal-title" class="serif text-[1.7rem] leading-tight font-semibold">${isNew ? 'Добавить чай' : q(nm)}</h3>
-            ${isCustom ? '' : `<p class="text-[12px] text-dim mt-1">База откалибрована по Mei Leaf (100 мл, фарфор). Ваши правки хранятся только на этом устройстве.</p>`}
+            ${isCustom ? '' : `<p class="text-[12px] text-dim mt-1">Значения заданы для 100 мл воды и фарфора. Ваши правки хранятся только на этом устройстве.</p>`}
           </div>
           <button type="button" class="icon-btn !w-9 !h-9 shrink-0" data-action="modal-cancel" aria-label="Закрыть">${ICON.close}</button>
         </div>

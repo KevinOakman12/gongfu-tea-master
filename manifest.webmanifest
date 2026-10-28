@@ -1,7 +1,7 @@
 {
-  "name": "Gongfu Tea Master",
-  "short_name": "Gongfu",
-  "description": "Помощник гунфу-чаепития: дозировка, таймер проливов, дневник",
+  "name": "茶道 ChaDao — Путь чая",
+  "short_name": "茶道",
+  "description": "Помощник чаепития: дозировка, таймер проливов, дневник",
   "lang": "ru",
   "start_url": "./",
   "scope": "./",
