@@ -5,29 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111714">
 <title>Gongfu Tea Master</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111714'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23C6A477'%3E%E8%8C%B6%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@500&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          ink: 'var(--text)',
-          sage: 'var(--text-secondary)',
-          dim: 'var(--text-muted)'
-        },
-        fontFamily: {
-          serif: ['"Cormorant Garamond"', '"Noto Serif SC"', 'Georgia', 'serif'],
-          sans: ['Inter', 'system-ui', '-apple-system', '"Segoe UI"', 'sans-serif'],
-          mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
-        }
-      }
-    }
-  };
-</script>
+<meta name="description" content="Gongfu Tea Master — помощник гунфу-чаепития: дозировка под посуду, таймер проливов, дневник.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Gongfu">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tailwind.css">
 <style>
   /* ═══ Dark Jade & Antique Bronze ═══ */
   :root {
@@ -78,6 +65,7 @@
     --tea-green-bg: #223224;
     --tea-yellow-bg: #373019;
     --on-accent: #1B211D;
+    color-scheme: dark;
     --ease: cubic-bezier(.2, .8, .2, 1);
     --timer-size: min(70vw, 36vh, 320px);
   }
@@ -549,6 +537,26 @@
   .qi:hover span { color: var(--text); }
   .qi input:checked + span { color: var(--text); border-color: var(--line-accent); background: var(--accent-soft); }
   .qi input:focus-visible + span { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+  /* ── Свои чаи: кнопки и форма ── */
+  .btn-add {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .5rem .9rem; border-radius: 999px; font-size: .85rem;
+    color: var(--accent-light); background: var(--accent-soft); border: 1px solid var(--line-accent);
+    transition: background-color .2s, border-color .2s;
+  }
+  .btn-add:hover { background: rgba(198, 164, 119, 0.2); border-color: var(--accent); }
+  .own { margin-left: auto; font-family: Inter, system-ui, sans-serif; font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem .8rem; }
+  .fld { min-width: 0; }
+  .fld > label, .fld-label { display: block; margin-bottom: .3rem; font-size: .66rem; text-transform: uppercase; letter-spacing: .12em; color: var(--text-muted); }
+  .fld .field { width: 100%; padding: .55rem .7rem; font-size: .95rem; }
+  .fld .field:disabled { opacity: .45; }
+  .fld-row { display: flex; align-items: center; gap: .45rem; }
+  .fld-unit { font-size: .78rem; color: var(--text-muted); white-space: nowrap; }
+  .check { display: flex; align-items: center; gap: .6rem; padding: .35rem 0; font-size: .9rem; color: var(--text-secondary); cursor: pointer; }
+  .check input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); flex-shrink: 0; }
+  .form-error { min-height: 1.3em; font-size: .84rem; color: var(--danger); }
 
   /* ── Toast ── */
   #toast {
@@ -1095,7 +1103,9 @@ const TEA_DATABASE = [
 ];
 
 console.assert(TEA_DATABASE.length === 36, `TEA_DATABASE должен содержать 36 сортов, сейчас: ${TEA_DATABASE.length}`);
-const TEA_BY_ID = Object.fromEntries(TEA_DATABASE.map(t => [t.id, t]));
+// Рабочий список (база + правки + свои сорта) собирается в rebuildTeas(); TEA_DATABASE остаётся неизменной базой из 36 сортов
+const TEA_BY_ID = {};
+let TEAS = [];
 
 /* ════════════════════════════════════════════════════════════════════
    3. ИКОНКИ
@@ -1265,7 +1275,8 @@ class SoundEngine {
 /* ════════════════════════════════════════════════════════════════════
    6. ХРАНИЛИЩЕ И СОСТОЯНИЕ
    ════════════════════════════════════════════════════════════════════ */
-const KEYS = { settings: 'gongfu_settings_v1', log: 'gongfu_log_v1', session: 'gongfu_session_v1', muted: 'gongfu_muted_v1' };
+const KEYS = { settings: 'gongfu_settings_v1', log: 'gongfu_log_v1', session: 'gongfu_session_v1', muted: 'gongfu_muted_v1',
+               customTeas: 'gongfu_custom_teas_v1', overrides: 'gongfu_overrides_v1' };
 const store = {
   get(key, fallback) {
     try { const v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); }
@@ -1277,6 +1288,96 @@ const store = {
   remove(key) { try { localStorage.removeItem(key); } catch {} }
 };
 
+/* ════════════════════════════════════════════════════════════════════
+   6b. СВОИ ЧАИ И ПРАВКИ БАЗЫ
+   Правки встроенных сортов хранятся отдельно (только изменённые поля),
+   поэтому «Сбросить к стандарту» всегда возвращает исходные значения.
+   ════════════════════════════════════════════════════════════════════ */
+const CATEGORY_COUNTS = {};
+const SEARCH_INDEX = {};
+const compactText = s => s.replace(/[\s'’\-()/·.,«»—]+/g, '');
+
+const TEA_DEFAULTS = {
+  curve_type: 'loose', temp_c: 90, grams_per_100ml: 5, needs_rinse: true, rinse_sec: 5, warm_breath_sec: 20,
+  base_sec: 10, step_sec: 6, max_steeps: 8, open_lid_warning: false, flavor_tags: [], brewing_tip: ''
+};
+const LIMITS = {
+  temp_c: [60, 100], grams_per_100ml: [1, 15], base_sec: [3, 300], step_sec: [0, 120],
+  max_steeps: [1, 20], rinse_sec: [1, 60], warm_breath_sec: [0, 120]
+};
+const FIELD_LABELS = {
+  temp_c: 'Температура', grams_per_100ml: 'Граммовка на 100 мл', base_sec: 'Время 1-го пролива',
+  step_sec: 'Шаг времени', max_steeps: 'Число проливов', rinse_sec: 'Время промывки', warm_breath_sec: 'Время прогрева'
+};
+
+function clampNum(v, [lo, hi], decimals = 0) {
+  if (v === '' || v == null) return null;
+  v = Number(v);
+  if (!Number.isFinite(v)) return null;
+  v = Math.min(hi, Math.max(lo, v));
+  return decimals ? Math.round(v * 10) / 10 : Math.round(v);
+}
+
+/** Оставляет только допустимые редактируемые поля и приводит их к границам */
+function cleanFields(raw) {
+  const o = {};
+  if (!raw || typeof raw !== 'object') return o;
+  for (const k of ['temp_c', 'base_sec', 'step_sec', 'max_steeps', 'rinse_sec', 'warm_breath_sec']) {
+    const v = clampNum(raw[k], LIMITS[k]);
+    if (v !== null) o[k] = v;
+  }
+  const g = clampNum(raw.grams_per_100ml, LIMITS.grams_per_100ml, 1);
+  if (g !== null) o.grams_per_100ml = g;
+  for (const k of ['needs_rinse', 'open_lid_warning']) if (typeof raw[k] === 'boolean') o[k] = raw[k];
+  if (CURVES[raw.curve_type]) o.curve_type = raw.curve_type;
+  if (Array.isArray(raw.flavor_tags)) o.flavor_tags = raw.flavor_tags.map(s => String(s).trim()).filter(Boolean).slice(0, 8);
+  if (typeof raw.brewing_tip === 'string') o.brewing_tip = raw.brewing_tip.trim().slice(0, 600);
+  return o;
+}
+
+function normalizeCustom(raw) {
+  if (!raw || typeof raw.id !== 'string' || !CAT[raw.categoryId]) return null;
+  const name = String(raw.name_ru || '').trim().slice(0, 80);
+  if (!name) return null;
+  return {
+    ...TEA_DEFAULTS, ...cleanFields(raw),
+    id: raw.id, name_ru: name, name_cn: String(raw.name_cn || '').trim().slice(0, 60),
+    categoryId: raw.categoryId, categoryName: CAT[raw.categoryId].short, custom: true
+  };
+}
+
+let customTeas = [];
+let overrides = {};
+{
+  const c = store.get(KEYS.customTeas, []);
+  if (Array.isArray(c)) customTeas = c.map(normalizeCustom).filter(Boolean);
+  const o = store.get(KEYS.overrides, {});
+  if (o && typeof o === 'object' && !Array.isArray(o)) {
+    for (const t of TEA_DATABASE) {
+      const f = cleanFields(o[t.id]);
+      if (Object.keys(f).length) overrides[t.id] = f;
+    }
+  }
+}
+const saveCustomTeas = () => store.set(KEYS.customTeas, customTeas);
+const saveOverrides = () => store.set(KEYS.overrides, overrides);
+
+/** Единственное место, где собирается рабочий список чаёв и производные индексы */
+function rebuildTeas() {
+  TEAS = TEA_DATABASE.map(t => overrides[t.id] ? { ...t, ...overrides[t.id], modified: true } : t).concat(customTeas);
+  for (const m of [TEA_BY_ID, CATEGORY_COUNTS, SEARCH_INDEX]) for (const k of Object.keys(m)) delete m[k];
+  for (const t of TEAS) {
+    TEA_BY_ID[t.id] = t;
+    CATEGORY_COUNTS[t.categoryId] = (CATEGORY_COUNTS[t.categoryId] || 0) + 1;
+    const hay = norm([
+      t.name_ru, t.name_cn, t.id.replace(/-/g, ' '), t.categoryName, CAT[t.categoryId].short,
+      t.curve_type, CURVES[t.curve_type].label, ...t.flavor_tags, t.brewing_tip
+    ].join(' '));
+    SEARCH_INDEX[t.id] = { hay, compact: compactText(hay) };
+  }
+}
+rebuildTeas();
+
 const savedSettings = store.get(KEYS.settings, {});
 const state = {
   screen: 'setup',
@@ -1285,7 +1386,7 @@ const state = {
   category: 'all',          // 'all' — витрина категорий, иначе id открытой категории
   query: '',
   curveInfoOpen: false,
-  selectedId: TEA_BY_ID[savedSettings.selectedId] ? savedSettings.selectedId : TEA_DATABASE[0].id,
+  selectedId: TEA_BY_ID[savedSettings.selectedId] ? savedSettings.selectedId : TEAS[0].id,
   session: null,
   log: store.get(KEYS.log, []),
   modal: null
@@ -1402,24 +1503,13 @@ function setMaterial(m) {
   renderDetail();
 }
 
-const CATEGORY_COUNTS = TEA_DATABASE.reduce((acc, t) => { acc[t.categoryId] = (acc[t.categoryId] || 0) + 1; return acc; }, {});
 const sortsLabel = n => `${n} ${pluralRu(n, 'сорт', 'сорта', 'сортов')}`;
-const compactText = s => s.replace(/[\s'’\-()/·.,«»—]+/g, '');
-
-// Индекс поиска строится один раз: база при поиске не изменяется
-const SEARCH_INDEX = Object.fromEntries(TEA_DATABASE.map(t => {
-  const hay = norm([
-    t.name_ru, t.name_cn, t.id.replace(/-/g, ' '), t.categoryName, CAT[t.categoryId].short,
-    t.curve_type, CURVES[t.curve_type].label, ...t.flavor_tags, t.brewing_tip
-  ].join(' '));
-  return [t.id, { hay, compact: compactText(hay) }];
-}));
 
 /** Глобальный поиск по всей базе — не зависит от открытой категории */
 function searchTeas(query) {
   const words = norm(query).split(/\s+/).filter(Boolean);
   if (!words.length) return [];
-  return TEA_DATABASE.filter(t => {
+  return TEAS.filter(t => {
     const ix = SEARCH_INDEX[t.id];
     return words.every(w => ix.hay.includes(w) || ix.compact.includes(compactText(w)));
   });
@@ -1429,7 +1519,7 @@ function teaCardHTML(t) {
   const c = CAT[t.categoryId];
   const cur = CURVES[t.curve_type];
   const g = calcGrams(t, state.volume, state.material);
-  const [main, sub] = splitParen(t.name_ru);
+  const [main, sub] = splitParen(t.name_ru).map(escapeHtml);
   const sel = t.id === state.selectedId;
   return `
     <button type="button" class="tea-card ${sel ? 'selected' : ''}" style="--c:${c.color}"
@@ -1437,7 +1527,7 @@ function teaCardHTML(t) {
       <span class="curve-ico" role="img" title="Кривая экстракции: ${cur.label}" aria-label="Тип кривой: ${cur.label}">${cur.icon}</span>
       <h3 class="serif tea-name">${main}</h3>
       ${sub ? `<span class="tea-sub">${sub}</span>` : ''}
-      <span class="tea-meta mono"><span class="g">${g.toFixed(1)} г</span><span class="sep" aria-hidden="true">·</span><span class="t">${t.temp_c}°C</span></span>
+      <span class="tea-meta mono"><span class="g">${g.toFixed(1)} г</span><span class="sep" aria-hidden="true">·</span><span class="t">${t.temp_c}°C</span>${t.custom ? '<span class="own">свой</span>' : t.modified ? '<span class="own">изменён</span>' : ''}</span>
     </button>`;
 }
 
@@ -1470,10 +1560,13 @@ function renderCatalog() {
     html = `
       <div class="cat-head">
         <div>
-          <div class="step-kicker">Поиск по всем ${TEA_DATABASE.length} сортам</div>
+          <div class="step-kicker">Поиск по всем ${TEAS.length} сортам</div>
           <h2 class="serif cat-head-title" aria-live="polite">${n ? `${found} ${sortsLabel(n)}` : 'Ничего не найдено'}</h2>
         </div>
-        <button type="button" class="btn-link" data-action="clear-search">Сбросить поиск</button>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button type="button" class="btn-add" data-action="new-tea" data-cat="">＋ Свой сорт</button>
+          <button type="button" class="btn-link" data-action="clear-search">Сбросить поиск</button>
+        </div>
       </div>
       ${n ? CATEGORIES.map(c => {
         const items = list.filter(t => t.categoryId === c.id);
@@ -1490,10 +1583,11 @@ function renderCatalog() {
   } else if (state.category !== 'all' && CAT[state.category]) {
     const c = CAT[state.category];
     key = 'cat:' + c.id;
-    const list = TEA_DATABASE.filter(t => t.categoryId === c.id);
+    const list = TEAS.filter(t => t.categoryId === c.id);
     html = `
       <div class="cat-head">
         <button type="button" class="btn-back" data-action="all-categories">${ICON.back}<span>Все категории</span></button>
+        <button type="button" class="btn-add" data-action="new-tea" data-cat="${c.id}">＋ Свой сорт</button>
       </div>
       <div class="cat-banner" style="--c:${c.color}; --cbg:${c.bg}">
         <span class="hz" aria-hidden="true">${c.glyph}</span>
@@ -1508,9 +1602,10 @@ function renderCatalog() {
     html = `
       <div class="cat-head">
         <div>
-          <div class="step-kicker">Каталог · ${sortsLabel(TEA_DATABASE.length)}</div>
+          <div class="step-kicker">Каталог · ${sortsLabel(TEAS.length)}</div>
           <h2 class="serif cat-head-title">Выберите категорию</h2>
         </div>
+        <button type="button" class="btn-add" data-action="new-tea" data-cat="">＋ Свой сорт</button>
       </div>
       <div class="cat-grid">${CATEGORIES.map(categoryCardHTML).join('')}</div>`;
   }
@@ -1573,8 +1668,8 @@ function renderDetail() {
   const cur = CURVES[t.curve_type];
   const g = calcGrams(t, state.volume, state.material);
   const times = generateSteepTimes(t);
-  const [main, sub] = splitParen(t.name_ru);
-  const [hz, py] = splitParen(t.name_cn);
+  const [main, sub] = splitParen(t.name_ru).map(escapeHtml);
+  const [hz, py] = splitParen(t.name_cn).map(escapeHtml);
   const clay = state.material === 'clay';
   const clayWarn = clay && t.temp_c <= 85;
   const total = times.reduce((a, b) => a + b, 0) + (t.needs_rinse ? t.rinse_sec : 0) + t.warm_breath_sec;
@@ -1588,6 +1683,7 @@ function renderDetail() {
     <div class="flex items-start justify-between gap-3">
       <div class="flex flex-wrap gap-2">
         <span class="badge">${t.categoryName}</span>
+        ${t.custom ? '<span class="curve-chip">свой сорт</span>' : t.modified ? '<span class="curve-chip">изменено вами</span>' : ''}
         <span class="curve-chip">${cur.icon}${cur.label}</span>
       </div>
       <button type="button" class="icon-btn !w-9 !h-9 lg:hidden shrink-0" data-action="close-sheet" aria-label="Закрыть">${ICON.close}</button>
@@ -1623,15 +1719,16 @@ function renderDetail() {
       <div><dt>Проливы</dt><dd>${t.max_steeps}</dd></div>
       <div><dt>Время</dt><dd>${fmtDuration(total).replace('≈ ', '')}</dd></div>
     </dl>
+    <button type="button" class="btn-link mt-2" data-action="edit-tea" data-id="${t.id}">✎ Изменить параметры</button>
 
-    <div class="mt-5">
+    ${t.flavor_tags.length ? `<div class="mt-5">
       <div class="section-label mb-2">Ноты вкуса</div>
-      <div class="flex flex-wrap gap-1.5">${t.flavor_tags.map(f => `<span class="tag">${f}</span>`).join('')}</div>
-    </div>
+      <div class="flex flex-wrap gap-1.5">${t.flavor_tags.map(f => `<span class="tag">${escapeHtml(f)}</span>`).join('')}</div>
+    </div>` : ''}
 
     <div class="tip mt-4">
       <div class="tip-label">Совет мастера</div>
-      <p class="serif italic">${t.brewing_tip}</p>
+      <p class="serif italic">${escapeHtml(t.brewing_tip) || '<span class="text-dim">Совет не добавлен</span>'}</p>
     </div>
 
     <div class="mt-5">
@@ -1956,8 +2053,8 @@ function renderSession() {
   const c = CAT[tea.categoryId];
   const cur = CURVES[tea.curve_type];
   const step = curStep();
-  const [main] = splitParen(tea.name_ru);
-  const [hz, py] = splitParen(tea.name_cn);
+  const [main] = splitParen(tea.name_ru).map(escapeHtml);
+  const [hz, py] = splitParen(tea.name_cn).map(escapeHtml);
   const clayWarn = s.material === 'clay' && tea.temp_c <= 85;
   const { kicker, title } = stepTitle(s);
   const remainingSteeps = s.steps.slice(s.idx).filter(x => x.kind === 'steep').length;
@@ -2121,7 +2218,7 @@ function openFinishModal() {
         <div class="flex items-start justify-between gap-3">
           <div>
             <div class="step-kicker">Чайный дневник</div>
-            <h3 id="modal-title" class="serif text-[1.8rem] leading-tight font-semibold">${splitParen(tea.name_ru)[0]}</h3>
+            <h3 id="modal-title" class="serif text-[1.8rem] leading-tight font-semibold">${escapeHtml(splitParen(tea.name_ru)[0])}</h3>
             <div class="text-[13px] text-sage mono">${s.grams.toFixed(1)} г · ${s.volume} мл · ${steepsDone} ${pluralRu(steepsDone, 'пролив', 'пролива', 'проливов')}</div>
           </div>
           <button type="button" class="icon-btn !w-9 !h-9 shrink-0" data-action="modal-cancel" aria-label="Закрыть">${ICON.close}</button>
@@ -2230,7 +2327,7 @@ function renderLog() {
   const freq = {};
   log.forEach(e => { freq[e.teaId] = (freq[e.teaId] || 0) + 1; });
   const favId = Object.keys(freq).sort((a, b) => freq[b] - freq[a])[0];
-  const favName = TEA_BY_ID[favId] ? splitParen(TEA_BY_ID[favId].name_ru)[0] : '—';
+  const favName = TEA_BY_ID[favId] ? escapeHtml(splitParen(TEA_BY_ID[favId].name_ru)[0]) : '—';
   const totalSteeps = log.reduce((a, e) => a + (e.steepsDone || 0), 0);
   const rated = log.filter(e => e.rating);
   const avg = rated.length ? (rated.reduce((a, e) => a + e.rating, 0) / rated.length).toFixed(1) : '—';
@@ -2309,6 +2406,205 @@ function repeatLogEntry(id) {
 }
 
 /* ════════════════════════════════════════════════════════════════════
+   10b. РЕДАКТОР СОРТА
+   ════════════════════════════════════════════════════════════════════ */
+const stripParens = s => String(s || '').replace(/[()]/g, '').trim();
+
+function openTeaEditor(id, catId) {
+  const base = id ? TEA_BY_ID[id] : null;
+  if (id && !base) return;
+  const isNew = !base;
+  const isCustom = isNew || !!base.custom;
+  const t = base || { ...TEA_DEFAULTS, categoryId: CAT[catId] ? catId : CATEGORIES[0].id, name_ru: '', name_cn: '' };
+  const [nm, sb] = splitParen(t.name_ru);
+  const [hz, py] = splitParen(t.name_cn || '');
+  const q = escapeHtml;
+  const num = (key, label, unit, step, val) => {
+    const [lo, hi] = LIMITS[key];
+    return `<div class="fld"><label for="te-${key}">${label}</label>
+      <div class="fld-row"><input id="te-${key}" name="${key}" type="number" min="${lo}" max="${hi}" step="${step}"
+        inputmode="${step === 'any' || step === '0.1' ? 'decimal' : 'numeric'}" value="${val}" class="field mono"><span class="fld-unit">${unit}</span></div></div>`;
+  };
+  const text = (name, label, val, ph, extra = '') =>
+    `<div class="fld ${extra}"><label for="te-${name}">${label}</label><input id="te-${name}" name="${name}" type="text" maxlength="80" value="${q(val)}" placeholder="${q(ph)}" class="field" autocomplete="off"></div>`;
+
+  state.modal = { type: 'tea' };
+  $('#modal-root').innerHTML = `
+    <div class="modal-wrap">
+      <div class="scrim" data-action="modal-cancel"></div>
+      <form class="modal" id="tea-form" novalidate role="dialog" aria-modal="true" aria-labelledby="modal-title" data-id="${id || ''}">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="step-kicker">${isNew ? 'Новый сорт' : isCustom ? 'Свой сорт' : 'Параметры сорта'}</div>
+            <h3 id="modal-title" class="serif text-[1.7rem] leading-tight font-semibold">${isNew ? 'Добавить чай' : q(nm)}</h3>
+            ${isCustom ? '' : `<p class="text-[12px] text-dim mt-1">База откалибрована по Mei Leaf (100 мл, фарфор). Ваши правки хранятся только на этом устройстве.</p>`}
+          </div>
+          <button type="button" class="icon-btn !w-9 !h-9 shrink-0" data-action="modal-cancel" aria-label="Закрыть">${ICON.close}</button>
+        </div>
+
+        <div class="mt-5 space-y-4">
+          ${isCustom ? `
+          <div class="form-grid">
+            ${text('name', 'Название *', nm, 'Например, Те Гуань Инь', 'col-span-2')}
+            ${text('subtitle', 'Подзаголовок', sb, 'Урожай, происхождение')}
+            <div class="fld"><label for="te-categoryId">Категория</label>
+              <select id="te-categoryId" name="categoryId" class="field">${CATEGORIES.map(c => `<option value="${c.id}" ${c.id === t.categoryId ? 'selected' : ''}>${c.short}</option>`).join('')}</select></div>
+            ${text('hanzi', 'Иероглифы', hz, '铁观音')}
+            ${text('pinyin', 'Пиньинь', py, 'Tiě Guānyīn')}
+          </div>` : ''}
+
+          <div class="form-grid">
+            ${num('temp_c', 'Температура', '°C', 1, t.temp_c)}
+            ${num('grams_per_100ml', 'Граммовка', 'г / 100 мл', '0.1', t.grams_per_100ml)}
+            ${num('base_sec', '1-й пролив', 'с', 1, t.base_sec)}
+            ${num('step_sec', 'Шаг времени', 'с', 1, t.step_sec)}
+            ${num('max_steeps', 'Проливов', 'шт', 1, t.max_steeps)}
+            ${num('warm_breath_sec', 'Прогрев', 'с', 1, t.warm_breath_sec)}
+            <div class="fld col-span-2">
+              <label class="check"><input type="checkbox" name="needs_rinse" ${t.needs_rinse ? 'checked' : ''}><span>Нужна промывка листа</span></label>
+              <div class="fld-row" style="margin-top:.2rem"><label for="te-rinse_sec" class="fld-label" style="margin:0">Время промывки</label>
+                <input id="te-rinse_sec" name="rinse_sec" type="number" min="1" max="60" step="1" inputmode="numeric" value="${t.rinse_sec || 5}" class="field mono" style="width:5rem" ${t.needs_rinse ? '' : 'disabled'}><span class="fld-unit">с</span></div>
+            </div>
+            <div class="fld col-span-2">
+              <label for="te-curve_type">Кривая экстракции</label>
+              <select id="te-curve_type" name="curve_type" class="field">${Object.entries(CURVES).map(([k, c]) => `<option value="${k}" ${k === t.curve_type ? 'selected' : ''}>${c.label}</option>`).join('')}</select>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" name="open_lid_warning" ${t.open_lid_warning ? 'checked' : ''}><span>Держать крышку приоткрытой между проливами</span></label>
+          <p class="mono text-[12px] text-sage leading-relaxed" id="te-preview" aria-live="polite"></p>
+
+          <div class="form-grid">
+            ${text('flavor_tags', 'Ноты вкуса (через запятую)', t.flavor_tags.join(', '), 'сирень, орхидея, сливочность', 'col-span-2')}
+            <div class="fld col-span-2"><label for="te-brewing_tip">Совет мастера</label>
+              <textarea id="te-brewing_tip" name="brewing_tip" rows="3" maxlength="600" class="field resize-none" placeholder="Что важно запомнить про этот чай">${q(t.brewing_tip)}</textarea></div>
+          </div>
+        </div>
+
+        <p class="form-error mt-3" id="tea-error" role="alert"></p>
+        <div class="mt-3 flex flex-col gap-2">
+          <button type="submit" class="btn-primary w-full">${ICON.check}<span>${isNew ? 'Добавить сорт' : 'Сохранить'}</span></button>
+          <div class="grid ${(!isCustom && t.modified) || (isCustom && !isNew) ? 'grid-cols-2' : 'grid-cols-1'} gap-2">
+            <button type="button" class="btn-ghost" data-action="modal-cancel">Отмена</button>
+            ${!isCustom && t.modified ? `<button type="button" class="btn-ghost" data-action="tea-reset" data-id="${t.id}">Сбросить к стандарту</button>` : ''}
+            ${isCustom && !isNew ? `<button type="button" class="btn-ghost btn-danger" data-action="tea-delete" data-id="${t.id}">${ICON.trash}<span>Удалить сорт</span></button>` : ''}
+          </div>
+        </div>
+      </form>
+    </div>`;
+  updateTeaPreview();
+  setTimeout(() => { const f = $('#te-name') || $('#te-temp_c'); if (f && window.innerWidth >= 640) f.focus(); }, 80);
+}
+
+function updateTeaPreview() {
+  const form = $('#tea-form');
+  if (!form) return;
+  const f = form.elements;
+  const n = k => Number(String(f[k].value).trim().replace(',', '.'));
+  const probe = { curve_type: f.curve_type.value, base_sec: Math.round(n('base_sec')), step_sec: Math.round(n('step_sec')), max_steeps: Math.round(n('max_steeps')) };
+  const ok = probe.base_sec >= LIMITS.base_sec[0] && probe.base_sec <= LIMITS.base_sec[1] &&
+             probe.step_sec >= 0 && probe.step_sec <= LIMITS.step_sec[1] &&
+             probe.max_steeps >= 1 && probe.max_steeps <= LIMITS.max_steeps[1];
+  $('#te-preview').textContent = ok ? 'Кривая: ' + generateSteepTimes(probe).map(fmtSec).join(' · ') : '';
+}
+
+function saveTeaForm(form) {
+  const id = form.dataset.id;
+  const base = id ? TEA_BY_ID[id] : null;
+  const isCustom = !base || base.custom;
+  const f = form.elements;
+  const fail = (msg, el) => { $('#tea-error').textContent = msg; if (el) el.focus(); };
+  const rinseOn = f.needs_rinse.checked;
+
+  const fields = {};
+  for (const key of Object.keys(LIMITS)) {
+    if (key === 'rinse_sec' && !rinseOn) continue;
+    const [lo, hi] = LIMITS[key];
+    const str = String(f[key].value).trim().replace(',', '.');
+    const v = Number(str);
+    if (str === '' || !Number.isFinite(v) || v < lo || v > hi) return fail(`${FIELD_LABELS[key]}: введите число от ${lo} до ${hi}`, f[key]);
+    fields[key] = key === 'grams_per_100ml' ? Math.round(v * 10) / 10 : Math.round(v);
+  }
+  fields.needs_rinse = rinseOn;
+  fields.open_lid_warning = f.open_lid_warning.checked;
+  fields.curve_type = f.curve_type.value;
+  fields.flavor_tags = f.flavor_tags.value.split(/[,;]+/).map(s => s.trim()).filter(Boolean).slice(0, 8);
+  fields.brewing_tip = f.brewing_tip.value.trim();
+
+  const hadSession = !!(state.session && state.session.teaId === id);
+  let selectId = id;
+
+  if (isCustom) {
+    const name = stripParens(f.name.value);
+    if (!name) return fail('Введите название сорта', f.name);
+    const sub = stripParens(f.subtitle.value), hz = stripParens(f.hanzi.value), py = stripParens(f.pinyin.value);
+    const cand = {
+      ...fields,
+      id: id || 'custom-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      name_ru: sub ? `${name} (${sub})` : name,
+      name_cn: hz && py ? `${hz} (${py})` : hz || (py ? ` (${py})` : ''),
+      categoryId: f.categoryId.value
+    };
+    if (!fields.needs_rinse && base) cand.rinse_sec = base.rinse_sec;
+    const tea = normalizeCustom(cand);
+    if (!tea) return fail('Не удалось сохранить сорт — проверьте поля', f.name);
+    const i = customTeas.findIndex(x => x.id === tea.id);
+    if (i >= 0) customTeas[i] = tea; else customTeas.push(tea);
+    saveCustomTeas();
+    selectId = tea.id;
+    state.category = tea.categoryId;
+  } else {
+    const orig = TEA_DATABASE.find(x => x.id === id);
+    const diff = {};
+    for (const [k, v] of Object.entries(fields)) {
+      if (JSON.stringify(v) !== JSON.stringify(orig[k])) diff[k] = v;
+    }
+    if (Object.keys(diff).length) overrides[id] = diff; else delete overrides[id];
+    saveOverrides();
+  }
+
+  rebuildTeas();
+  closeModal();
+  state.selectedId = selectId;
+  saveSettings();
+  if (isCustom) {
+    state.query = '';
+    $('#search').value = '';
+  }
+  renderCatalog();
+  renderDetail();
+  if (isCustom && window.innerWidth < 1024) openSheet();
+  toast(hadSession ? 'Сохранено. Текущая церемония идёт по прежним параметрам' : isCustom ? 'Сорт сохранён' : 'Параметры сорта сохранены');
+}
+
+function resetTeaOverrides(id) {
+  if (!overrides[id]) return;
+  delete overrides[id];
+  saveOverrides();
+  rebuildTeas();
+  closeModal();
+  renderCatalog();
+  renderDetail();
+  toast('Параметры возвращены к стандартным');
+}
+
+function deleteCustomTea(id) {
+  const t = TEA_BY_ID[id];
+  if (!t || !t.custom) return;
+  if (state.session && state.session.teaId === id) { toast('Сначала завершите текущую церемонию с этим сортом'); return; }
+  if (!confirm(`Удалить сорт «${splitParen(t.name_ru)[0]}»? Записи в дневнике сохранятся.`)) return;
+  customTeas = customTeas.filter(x => x.id !== id);
+  saveCustomTeas();
+  rebuildTeas();
+  closeModal();
+  if (state.selectedId === id) state.selectedId = (TEAS.find(x => x.categoryId === t.categoryId) || TEAS[0]).id;
+  saveSettings();
+  renderCatalog();
+  renderDetail();
+  closeSheet();
+  toast('Сорт удалён');
+}
+
+/* ════════════════════════════════════════════════════════════════════
    11. НАВИГАЦИЯ
    ════════════════════════════════════════════════════════════════════ */
 function showScreen(name) {
@@ -2327,6 +2623,27 @@ function showScreen(name) {
   updateNav();
 }
 
+/* Экран не гаснет, пока идёт отсчёт (Screen Wake Lock) */
+let wakeSentinel = null, wakePending = false, wakeRetryAt = 0;
+function syncWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  const want = !!(state.session && state.session.running) && document.visibilityState === 'visible';
+  if (want && !wakeSentinel && !wakePending && performance.now() >= wakeRetryAt) {
+    wakePending = true;
+    navigator.wakeLock.request('screen').then(s => {
+      wakePending = false;
+      wakeSentinel = s;
+      s.addEventListener('release', () => { if (wakeSentinel === s) wakeSentinel = null; });
+      if (!(state.session && state.session.running)) { wakeSentinel = null; s.release().catch(() => {}); }
+    }).catch(() => { wakePending = false; wakeRetryAt = performance.now() + 5000; });
+  } else if (!want && wakeSentinel) {
+    const s = wakeSentinel;
+    wakeSentinel = null;
+    s.release().catch(() => {});
+  }
+}
+document.addEventListener('visibilitychange', syncWakeLock);
+
 function updateNav() {
   const s = state.session;
   const dot = $('#nav-dot'), timer = $('#nav-timer');
@@ -2335,6 +2652,7 @@ function updateNav() {
   const showTimer = !!(s && s.running && state.screen !== 'session');
   timer.hidden = !showTimer;
   if (showTimer) timer.textContent = fmtClock(s.remainingMs);
+  syncWakeLock();
 }
 
 function updateMuteBtn() {
@@ -2371,6 +2689,10 @@ document.addEventListener('click', e => {
     case 'all-categories': showAllCategories(); break;
     case 'toggle-info':    setInfoOpen(!$('#material-info').classList.contains('open')); break;
     case 'toggle-curve-info': toggleCurveInfo(el); break;
+    case 'new-tea':        openTeaEditor(null, el.dataset.cat); break;
+    case 'edit-tea':       openTeaEditor(el.dataset.id); break;
+    case 'tea-reset':      resetTeaOverrides(el.dataset.id); break;
+    case 'tea-delete':     deleteCustomTea(el.dataset.id); break;
     case 'clear-search':
       state.query = '';
       $('#search').value = '';
@@ -2401,6 +2723,17 @@ document.addEventListener('click', e => {
     case 'log-delete':     deleteLogEntry(el.dataset.id); break;
     case 'log-repeat':     repeatLogEntry(el.dataset.id); break;
   }
+});
+
+document.addEventListener('submit', e => {
+  if (e.target.id === 'tea-form') { e.preventDefault(); saveTeaForm(e.target); }
+});
+document.addEventListener('input', e => {
+  if (e.target.closest && e.target.closest('#tea-form')) { updateTeaPreview(); $('#tea-error').textContent = ''; }
+});
+document.addEventListener('change', e => {
+  if (e.target.name === 'needs_rinse') { $('#te-rinse_sec').disabled = !e.target.checked; }
+  if (e.target.closest && e.target.closest('#tea-form')) updateTeaPreview();
 });
 
 $('#vol-range').addEventListener('input', e => setVolume(e.target.value));
@@ -2445,6 +2778,11 @@ renderDetail();
 updateMuteBtn();
 updateNav();
 setInterval(tick, 50);
+/* Офлайн-режим: service worker кэширует приложение, шрифты и стили */
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+
 </script>
 </body>
 </html>
