@@ -152,21 +152,31 @@
     background: var(--surface);
   }
 
-  /* ── Панель посуды (компактный toolbar) ── */
-  .vessel {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: .7rem 1rem; padding: .7rem .9rem; border-radius: 16px;
-  }
-  .vessel-vol { display: flex; align-items: center; gap: .55rem; }
+  /* ── Панель посуды ── */
+  .vessel { padding: .75rem .95rem; border-radius: 16px; }
+  .vessel-body { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.6rem; }
+  .vessel-left { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: .6rem; }
+  .vessel-line { display: flex; align-items: center; gap: .75rem; }
   .vessel-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .14em; color: var(--text-muted); }
   .vol-field { display: flex; align-items: center; gap: .35rem; font-size: .85rem; color: var(--text-secondary); }
   .vol-field input { width: 4.2rem; text-align: right; padding: .35rem .55rem; font-size: .95rem; }
-  .vessel-range { flex: 1 1 140px; min-width: 120px; }
-  .vessel-presets { display: flex; flex-wrap: wrap; gap: .3rem; }
-  .vessel-mat { display: flex; align-items: center; gap: .4rem; margin-left: auto; }
+  .vessel-range { flex: 1 1 auto; min-width: 120px; }
+  .vessel-presets { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .vessel-mat { display: flex; align-items: center; gap: .5rem; flex: 0 0 auto; margin-left: auto; }
+  .vessel-mat .seg button { padding: .65rem 1.1rem; font-size: .86rem; }
+  .vessel-summary { display: none; width: 100%; align-items: center; gap: .6rem; min-height: 2.5rem; text-align: left; color: var(--text); }
+  .vessel-sum { font-size: .95rem; }
+  .vessel-edit { margin-left: auto; color: var(--accent); font-size: 1rem; }
+  .vessel-edit::before { content: '✎'; }
+  .vessel-summary[aria-expanded="true"] .vessel-edit::before { content: '✕'; }
   @media (max-width: 639px) {
-    .vessel-mat { margin-left: 0; width: 100%; }
+    .vessel-summary { display: flex; }
+    .vessel-body { display: none; margin-top: .8rem; flex-direction: column; align-items: stretch; }
+    .vessel.open .vessel-body { display: flex; }
+    .vessel-left { flex: none; }
+    .vessel-mat { width: 100%; margin-left: 0; }
     .vessel-mat .seg { flex: 1; }
+    .vessel-mat .seg button { padding: .5rem .6rem; font-size: .8rem; }
   }
 
   .seg { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
@@ -545,7 +555,7 @@
     transition: background-color .2s, border-color .2s;
   }
   .btn-add:hover { background: rgba(198, 164, 119, 0.2); border-color: var(--accent); }
-  .own { margin-left: auto; font-family: Inter, system-ui, sans-serif; font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+  .own { margin-left: .35rem; font-family: Inter, system-ui, sans-serif; font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
   .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem .8rem; }
   .fld { min-width: 0; }
   .fld > label, .fld-label { display: block; margin-bottom: .3rem; font-size: .66rem; text-transform: uppercase; letter-spacing: .12em; color: var(--text-muted); }
@@ -566,6 +576,56 @@
     .tab { padding: .45rem .5rem; font-size: .8rem; }
     .app-header .hz.text-2xl { font-size: 1.35rem; }
   }
+
+  /* ── Избранное ── */
+  .tea-item { position: relative; display: flex; min-width: 0; }
+  .tea-item > .tea-card { flex: 1; min-width: 0; }
+  .fav-btn { position: absolute; right: .35rem; bottom: .3rem; width: 2.4rem; height: 2.4rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; color: var(--text-muted); transition: color .2s, background-color .2s; }
+  .fav-btn .ico { width: 1.1rem; height: 1.1rem; }
+  .fav-btn:hover { color: var(--accent-light); background: var(--accent-soft); }
+  .fav-btn[aria-pressed="true"] { color: var(--accent); }
+  .fav-section { margin-bottom: 1.8rem; }
+  /* На телефоне избранное — горизонтальная лента, чтобы не вытеснять категории; «Показать все» раскрывает список */
+  @media (max-width: 639px) {
+    .fav-section:not(.expanded) .tea-grid {
+      display: flex; gap: .7rem; overflow-x: auto; scroll-snap-type: x proximity;
+      margin: 0 -1rem; padding: 0 1rem .5rem; scroll-padding: 0 1rem; scrollbar-width: none;
+    }
+    .fav-section:not(.expanded) .tea-grid::-webkit-scrollbar { display: none; }
+    .fav-section:not(.expanded) .tea-item { flex: 0 0 min(74vw, 270px); scroll-snap-align: start; }
+  }
+  .fav-count { margin-left: .4rem; font-size: .8rem; color: var(--text-muted); vertical-align: middle; }
+
+  /* ── Дневник: фильтры и статистика ── */
+  .log-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem .8rem; align-items: end; padding: .85rem 1rem; border-radius: 16px; margin-top: 1rem; }
+  .log-filters > :first-child, .log-filters > .btn-ghost { grid-column: 1 / -1; }
+  @media (min-width: 640px) {
+    .log-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .log-filters > :first-child { grid-column: auto; }
+    .log-filters > .btn-ghost { grid-column: 1 / -1; justify-self: start; }
+  }
+  .log-dates { grid-column: 1 / -1; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-top: .6rem; }
+  .stat-grid .wide { grid-column: span 2; }
+  @media (min-width: 640px) { .stat-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } .stat-grid .wide { grid-column: span 1; } }
+  .stat-note { margin-top: .5rem; font-size: .72rem; color: var(--text-muted); }
+  .stat-panels { display: grid; grid-template-columns: minmax(0, 1fr); gap: .7rem; margin-top: .7rem; }
+  @media (min-width: 768px) { .stat-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat-panel { padding: .9rem 1rem 1rem; border-radius: 16px; background: var(--bg-secondary); border: 1px solid var(--line); min-width: 0; }
+  .top-list { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .65rem; }
+  .top-head { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; font-size: .9rem; }
+  .top-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+  .top-num { font-size: .78rem; color: var(--text-secondary); white-space: nowrap; }
+  .top-bar { height: 4px; margin-top: .3rem; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .top-bar span { display: block; height: 100%; border-radius: 4px; }
+  .dyn svg { display: block; width: 100%; height: auto; margin-top: .5rem; overflow: visible; }
+  .ch-grid { stroke: var(--line); stroke-width: 1; }
+  .ch-raw { fill: none; stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; }
+  .ch-ma { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+  .ch-dot { fill: var(--bg-secondary); stroke: var(--accent); stroke-width: 1.6; }
+  .ch-lbl { fill: var(--text-muted); font-size: 8.5px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .trend-up { color: var(--success); }
+  .trend-down { color: var(--danger); }
 
   /* ── Toast ── */
   #toast {
@@ -629,25 +689,34 @@
     <div class="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-6 items-start">
       <div class="min-w-0 space-y-4">
 
-        <!-- Панель посуды: компактный toolbar -->
-        <div class="vessel panel" role="group" aria-label="Настройка посуды">
-          <div class="vessel-vol">
-            <label for="vol-input" class="vessel-label">Объём</label>
-            <div class="vol-field">
-              <input id="vol-input" type="number" min="50" max="400" step="10" inputmode="numeric" class="field mono" aria-label="Объём посуды в миллилитрах, от 50 до 400">
-              <span>мл</span>
+        <!-- Панель посуды: на телефоне сворачивается в одну строку -->
+        <div class="vessel panel" id="vessel" role="group" aria-label="Настройка посуды">
+          <button type="button" class="vessel-summary" id="vessel-summary" data-action="toggle-vessel" aria-expanded="false" aria-controls="vessel-body" aria-label="Настройка посуды: объём и материал">
+            <span class="vessel-label">Посуда</span>
+            <span class="vessel-sum mono" id="vessel-sum"></span>
+            <span class="vessel-edit" aria-hidden="true"></span>
+          </button>
+          <div class="vessel-body" id="vessel-body">
+            <div class="vessel-left">
+              <div class="vessel-line">
+                <label for="vol-input" class="vessel-label">Объём</label>
+                <div class="vol-field">
+                  <input id="vol-input" type="number" min="50" max="400" step="10" inputmode="numeric" class="field mono" aria-label="Объём посуды в миллилитрах, от 50 до 400">
+                  <span>мл</span>
+                </div>
+                <input id="vol-range" type="range" class="range vessel-range" min="50" max="400" step="10" aria-label="Объём посуды">
+              </div>
+              <div class="vessel-presets" id="vol-presets" role="group" aria-label="Быстрые пресеты объёма"></div>
             </div>
-          </div>
-          <input id="vol-range" type="range" class="range vessel-range" min="50" max="400" step="10" aria-label="Объём посуды">
-          <div class="vessel-presets" id="vol-presets" role="group" aria-label="Быстрые пресеты объёма"></div>
-          <div class="vessel-mat">
-            <div class="seg" role="group" aria-label="Материал посуды">
-              <button type="button" data-action="material" data-val="porcelain">Фарфор / Стекло</button>
-              <button type="button" data-action="material" data-val="clay">Исинская глина</button>
-            </div>
-            <div class="info" id="material-info">
-              <button type="button" class="info-btn" data-action="toggle-info" aria-expanded="false" aria-controls="material-pop" aria-label="Чем отличаются материалы посуды">ⓘ</button>
-              <div class="info-pop" id="material-pop" role="tooltip"></div>
+            <div class="vessel-mat">
+              <div class="seg" role="group" aria-label="Материал посуды">
+                <button type="button" data-action="material" data-val="porcelain">Фарфор / Стекло</button>
+                <button type="button" data-action="material" data-val="clay">Исинская глина</button>
+              </div>
+              <div class="info" id="material-info">
+                <button type="button" class="info-btn" data-action="toggle-info" aria-expanded="false" aria-controls="material-pop" aria-label="Чем отличаются материалы посуды">ⓘ</button>
+                <div class="info-pop" id="material-pop" role="tooltip"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1142,6 +1211,8 @@ const ICON = {
   warn:    svg('<path d="M12 4l9 16H3z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.3" r=".6" fill="currentColor"/>'),
   cup:     svg('<path d="M4 9h13v3a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z"/><path d="M17 10.5h1.2a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5c0 1.2 1 1.2 1 2.4M11.5 3.5c0 1.2 1 1.2 1 2.4"/>'),
   cupFill: svg('<path d="M4 9h13v3a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z" fill="currentColor"/><path d="M17 10.5h1.2a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5c0 1.2 1 1.2 1 2.4M11.5 3.5c0 1.2 1 1.2 1 2.4"/>'),
+  star:    svg('<path d="M12 4.2l2.5 5.1 5.6.8-4.1 3.9 1 5.6L12 17l-5 2.6 1-5.6-4.1-3.9 5.6-.8z"/>'),
+  starFill:svg('<path d="M12 4.2l2.5 5.1 5.6.8-4.1 3.9 1 5.6L12 17l-5 2.6 1-5.6-4.1-3.9 5.6-.8z" fill="currentColor"/>'),
   back:    svg('<path d="M10 6l-6 6 6 6"/><path d="M4 12h16"/>'),
   chevron: svg('<path d="M6 9l6 6 6-6"/>', 'class="ico chev"'),
   leaf:    svg('<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l8-8"/>'),
@@ -1286,7 +1357,7 @@ class SoundEngine {
    6. ХРАНИЛИЩЕ И СОСТОЯНИЕ
    ════════════════════════════════════════════════════════════════════ */
 const KEYS = { settings: 'gongfu_settings_v1', log: 'gongfu_log_v1', session: 'gongfu_session_v1', muted: 'gongfu_muted_v1',
-               customTeas: 'gongfu_custom_teas_v1', overrides: 'gongfu_overrides_v1' };
+               customTeas: 'gongfu_custom_teas_v1', overrides: 'gongfu_overrides_v1', favorites: 'gongfu_favorites_v1' };
 const store = {
   get(key, fallback) {
     try { const v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); }
@@ -1372,6 +1443,13 @@ let overrides = {};
 const saveCustomTeas = () => store.set(KEYS.customTeas, customTeas);
 const saveOverrides = () => store.set(KEYS.overrides, overrides);
 
+let favorites = [];
+{
+  const f = store.get(KEYS.favorites, []);
+  if (Array.isArray(f)) favorites = [...new Set(f.filter(x => typeof x === 'string'))];
+}
+const saveFavorites = () => store.set(KEYS.favorites, favorites);
+
 /** Единственное место, где собирается рабочий список чаёв и производные индексы */
 function rebuildTeas() {
   TEAS = TEA_DATABASE.map(t => overrides[t.id] ? { ...t, ...overrides[t.id], modified: true } : t).concat(customTeas);
@@ -1406,6 +1484,9 @@ const state = {
   category: 'all',          // 'all' — витрина категорий, иначе id открытой категории
   query: '',
   curveInfoOpen: false,
+  vesselOpen: false,
+  favExpanded: false,
+  logFilter: { tea: '', rating: '', period: 'all', from: '', to: '' },
   selectedId: TEA_BY_ID[savedSettings.selectedId] ? savedSettings.selectedId : TEAS[0].id,
   session: null,
   log: loadLog(),
@@ -1505,6 +1586,9 @@ function updateVesselUI() {
   if (document.activeElement !== $('#vol-input')) $('#vol-input').value = v;
   $$('#vol-presets .preset').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.val) === v)));
   $$('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.val === state.material)));
+  $('#vessel-sum').textContent = `${v} мл · ${state.material === 'clay' ? 'Глина' : 'Фарфор'}`;
+  $('#vessel').classList.toggle('open', state.vesselOpen);
+  $('#vessel-summary').setAttribute('aria-expanded', String(state.vesselOpen));
 }
 
 function setVolume(v) {
@@ -1541,14 +1625,55 @@ function teaCardHTML(t) {
   const g = calcGrams(t, state.volume, state.material);
   const [main, sub] = splitParen(t.name_ru).map(escapeHtml);
   const sel = t.id === state.selectedId;
+  const fav = favorites.includes(t.id);
+  const favLabel = `${fav ? 'Убрать из избранного' : 'Добавить в избранное'}: ${main}`;
   return `
-    <button type="button" class="tea-card ${sel ? 'selected' : ''}" style="--c:${c.color}"
-            data-action="select-tea" data-id="${t.id}" aria-pressed="${sel}">
-      <span class="curve-ico" role="img" title="Кривая экстракции: ${cur.label}" aria-label="Тип кривой: ${cur.label}">${cur.icon}</span>
-      <h3 class="serif tea-name">${main}</h3>
-      ${sub ? `<span class="tea-sub">${sub}</span>` : ''}
-      <span class="tea-meta mono"><span class="g">${g.toFixed(1)} г</span><span class="sep" aria-hidden="true">·</span><span class="t">${t.temp_c}°C</span>${t.custom ? '<span class="own">свой</span>' : t.modified ? '<span class="own">изменён</span>' : ''}</span>
-    </button>`;
+    <div class="tea-item">
+      <button type="button" class="tea-card ${sel ? 'selected' : ''}" style="--c:${c.color}"
+              data-action="select-tea" data-id="${t.id}" aria-pressed="${sel}">
+        <span class="curve-ico" role="img" title="Кривая экстракции: ${cur.label}" aria-label="Тип кривой: ${cur.label}">${cur.icon}</span>
+        <h3 class="serif tea-name">${main}</h3>
+        ${sub ? `<span class="tea-sub">${sub}</span>` : ''}
+        <span class="tea-meta mono"><span class="g">${g.toFixed(1)} г</span><span class="sep" aria-hidden="true">·</span><span class="t">${t.temp_c}°C</span>${t.custom ? '<span class="own">свой</span>' : t.modified ? '<span class="own">изменён</span>' : ''}</span>
+      </button>
+      <button type="button" class="fav-btn" data-action="toggle-fav" data-id="${t.id}" aria-pressed="${fav}" aria-label="${favLabel}" title="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}">${fav ? ICON.starFill : ICON.star}</button>
+    </div>`;
+}
+
+const FAV_PREVIEW = 6;
+const favoriteTeas = () => favorites.map(id => TEA_BY_ID[id]).filter(Boolean);
+
+function favoritesSectionHTML() {
+  const list = favoriteTeas();
+  if (!list.length) return '';
+  const more = list.length > FAV_PREVIEW;
+  const shown = more && !state.favExpanded ? list.slice(0, FAV_PREVIEW) : list;
+  return `
+    <section class="fav-section ${state.favExpanded ? 'expanded' : ''}" aria-labelledby="fav-title">
+      <div class="cat-head">
+        <div>
+          <div class="step-kicker">Ваши любимые</div>
+          <h2 id="fav-title" class="serif cat-head-title">Избранное<span class="fav-count mono">${list.length}</span></h2>
+        </div>
+        ${more ? `<button type="button" class="btn-link" data-action="toggle-fav-all" aria-expanded="${state.favExpanded}">${state.favExpanded ? 'Свернуть' : `Показать все ${list.length}`}</button>` : ''}
+      </div>
+      <div class="tea-grid">${shown.map(teaCardHTML).join('')}</div>
+    </section>`;
+}
+
+function toggleFavorite(id) {
+  if (!TEA_BY_ID[id]) return;
+  const fromDetail = !!(document.activeElement && document.activeElement.closest('#detail'));
+  const i = favorites.indexOf(id);
+  if (i >= 0) favorites.splice(i, 1); else favorites.push(id);
+  saveFavorites();
+  renderCatalog();
+  const d = $('#detail'), top = d.scrollTop;
+  renderDetail();
+  d.scrollTop = top;
+  const btn = fromDetail ? $('#detail [data-action="toggle-fav"]') : $(`#catalog .fav-btn[data-id="${id}"]`);
+  if (btn) btn.focus({ preventScroll: true });
+  toast(i >= 0 ? 'Убрано из избранного' : 'Добавлено в избранное');
 }
 
 function categoryCardHTML(c) {
@@ -1620,6 +1745,7 @@ function renderCatalog() {
   } else {
     key = 'showcase';
     html = `
+      ${favoritesSectionHTML()}
       <div class="cat-head">
         <div>
           <div class="step-kicker">Каталог · ${sortsLabel(TEAS.length)}</div>
@@ -1739,7 +1865,10 @@ function renderDetail() {
       <div><dt>Проливы</dt><dd>${t.max_steeps}</dd></div>
       <div><dt>Время</dt><dd>${fmtDuration(total).replace('≈ ', '')}</dd></div>
     </dl>
-    <button type="button" class="btn-link mt-2" data-action="edit-tea" data-id="${t.id}">✎ Изменить параметры</button>
+    <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+      <button type="button" class="btn-link" data-action="toggle-fav" data-id="${t.id}" aria-pressed="${favorites.includes(t.id)}">${favorites.includes(t.id) ? '★ В избранном' : '☆ В избранное'}</button>
+      <button type="button" class="btn-link" data-action="edit-tea" data-id="${t.id}">✎ Изменить параметры</button>
+    </div>
 
     ${t.flavor_tags.length ? `<div class="mt-5">
       <div class="section-label mb-2">Ноты вкуса</div>
@@ -2319,6 +2448,7 @@ function saveLogEntry() {
   };
   state.log.unshift(entry);
   store.set(KEYS.log, state.log);
+  state.logFilter = { tea: '', rating: '', period: 'all', from: '', to: '' };
   closeModal();
   endSession();
   showScreen('log');
@@ -2332,10 +2462,131 @@ function endSession() {
   updateTitle();
 }
 
+const LOG_PERIODS = [['all', 'За всё время'], ['7', 'Последние 7 дней'], ['30', 'Последние 30 дней'], ['90', 'Последние 90 дней'], ['year', 'Этот год'], ['custom', 'Свой период…']];
+const LOG_RATINGS = [['', 'Любая оценка'], ['5', '5 пиал'], ['4+', '4 и выше'], ['3+', '3 и выше'], ['1-2', '1–2 пиалы'], ['0', 'Без оценки']];
+const emptyLogFilter = () => ({ tea: '', rating: '', period: 'all', from: '', to: '' });
+const logFilterActive = f => !!(f.tea || f.rating || f.period !== 'all');
+
+/** [от, до] в миллисекундах; границы своего периода включают целые локальные сутки */
+function logPeriodRange(f) {
+  if (f.period === 'custom') {
+    let from = f.from ? new Date(f.from + 'T00:00:00').getTime() : -Infinity;
+    let to = f.to ? new Date(f.to + 'T23:59:59.999').getTime() : Infinity;
+    if (from > to) [from, to] = [new Date(f.to + 'T00:00:00').getTime(), new Date(f.from + 'T23:59:59.999').getTime()];
+    return [from, to];
+  }
+  if (f.period === 'year') return [new Date(new Date().getFullYear(), 0, 1).getTime(), Infinity];
+  const n = Number(f.period);
+  return n ? [Date.now() - n * 86400000, Infinity] : [-Infinity, Infinity];
+}
+
+function matchesRating(r, f) {
+  switch (f) {
+    case '5': return r === 5;
+    case '4+': return r >= 4;
+    case '3+': return r >= 3;
+    case '1-2': return r >= 1 && r <= 2;
+    case '0': return !r;
+    default: return true;
+  }
+}
+
+function filteredLog() {
+  const f = state.logFilter, [from, to] = logPeriodRange(f);
+  const byDate = from !== -Infinity || to !== Infinity;
+  return state.log.filter(e => {
+    if (f.tea && e.teaId !== f.tea) return false;
+    if (!matchesRating(e.rating || 0, f.rating)) return false;
+    if (byDate) { const t = Date.parse(e.date); if (!(t >= from && t <= to)) return false; }
+    return true;
+  });
+}
+
+const fmtVolume = ml => ml >= 1000 ? `${(ml / 1000).toFixed(1)} л` : `${Math.round(ml)} мл`;
+const byDateDesc = (a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0);
+
+function logStats(list) {
+  const rated = list.filter(e => e.rating >= 1 && e.rating <= 5);
+  const byTea = new Map();
+  for (const e of list) {
+    const o = byTea.get(e.teaId) || { name: splitParen(e.teaName)[0], cat: e.categoryId, count: 0, sum: 0, rated: 0 };
+    o.count++;
+    if (e.rating) { o.sum += e.rating; o.rated++; }
+    byTea.set(e.teaId, o);
+  }
+  const mean = o => o.rated ? o.sum / o.rated : 0;
+  return {
+    count: list.length,
+    steeps: list.reduce((a, e) => a + (e.steepsDone || 0), 0),
+    grams: list.reduce((a, e) => a + e.grams, 0),
+    waterMl: list.reduce((a, e) => a + e.volume * (e.steepsDone || 0), 0),
+    avg: rated.length ? rated.reduce((a, e) => a + e.rating, 0) / rated.length : null,
+    top: [...byTea.values()].sort((a, b) => b.count - a.count || mean(b) - mean(a)).slice(0, 5),
+    series: rated.slice().sort((a, b) => -byDateDesc(a, b)).slice(-30)
+  };
+}
+
+function dynamicsHTML(series) {
+  if (series.length < 2) return '<p class="text-sm text-sage mt-3">Нужно как минимум две оценённые церемонии, чтобы построить график.</p>';
+  const W = 320, H = 132, L = 20, R = 8, T = 10, B = 22;
+  const x = i => L + i * (W - L - R) / (series.length - 1);
+  const y = r => T + (5 - r) * (H - T - B) / 4;
+  const ma = series.map((_, i) => { const w = series.slice(Math.max(0, i - 2), i + 1); return w.reduce((a, e) => a + e.rating, 0) / w.length; });
+  const pts = arr => arr.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const day = e => new Date(e.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  const mean = a => a.reduce((s, e) => s + e.rating, 0) / a.length;
+  let trend = '';
+  if (series.length >= 6) {
+    const recent = mean(series.slice(-5)), before = mean(series.slice(0, -5)), d = recent - before;
+    trend = `<p class="text-[13px] text-sage mt-2">Последние 5: <b class="mono text-ink">${recent.toFixed(1)}</b> · раньше: <span class="mono">${before.toFixed(1)}</span> ` +
+            (Math.abs(d) >= 0.05 ? `<span class="mono ${d > 0 ? 'trend-up' : 'trend-down'}">${d > 0 ? '▲ +' : '▼ −'}${Math.abs(d).toFixed(1)}</span>` : '<span class="mono">без изменений</span>') + '</p>';
+  }
+  return `<div class="dyn">
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="График оценок: ${series.length} последних оценённых церемоний, от ${series[0].rating} до ${series[series.length - 1].rating} пиал">
+      ${[1, 2, 3, 4, 5].map(r => `<line class="ch-grid" x1="${L}" x2="${W - R}" y1="${y(r)}" y2="${y(r)}"/><text class="ch-lbl" x="${L - 6}" y="${y(r) + 3}" text-anchor="end">${r}</text>`).join('')}
+      <polyline class="ch-raw" points="${pts(series.map(e => e.rating))}"/>
+      <polyline class="ch-ma" points="${pts(ma)}"/>
+      ${series.map((e, i) => `<circle class="ch-dot" cx="${x(i).toFixed(1)}" cy="${y(e.rating).toFixed(1)}" r="3"><title>${day(e)} · ${e.rating} из 5</title></circle>`).join('')}
+      <text class="ch-lbl" x="${L}" y="${H - 6}">${day(series[0])}</text>
+      <text class="ch-lbl" x="${W - R}" y="${H - 6}" text-anchor="end">${day(series[series.length - 1])}</text>
+    </svg>
+    <p class="stat-note">Точки — оценки, линия — скользящее среднее по трём последним.</p>
+    ${trend}
+  </div>`;
+}
+
+function statsHTML(st) {
+  const max = st.top.length ? st.top[0].count : 1;
+  const tile = (k, v, cls = '', title = '') => `<div class="stat ${cls}" ${title ? `title="${title}"` : ''}><div class="k">${k}</div><div class="v text-lg">${v}</div></div>`;
+  return `
+    <div class="stat-grid">
+      ${tile('Чаепитий', st.count)}
+      ${tile('Проливов', st.steeps)}
+      ${tile('Выпито ≈', fmtVolume(st.waterMl), '', 'Ориентировочно: объём посуды × число проливов')}
+      ${tile('Чая заварено', st.grams.toFixed(1) + ' г')}
+      ${tile('Средняя оценка', st.avg == null ? '—' : st.avg.toFixed(1), 'wide')}
+    </div>
+    <p class="stat-note">«Выпито» — оценка по объёму посуды и числу проливов.</p>
+    <div class="stat-panels">
+      <section class="stat-panel" aria-label="Любимые сорта">
+        <h4 class="section-label">Любимые сорта</h4>
+        <ol class="top-list">
+          ${st.top.map(o => `<li>
+            <div class="top-head"><span class="top-name">${escapeHtml(o.name)}</span><span class="top-num mono">${o.count}×${o.rated ? ` · ★ ${(o.sum / o.rated).toFixed(1)}` : ''}</span></div>
+            <div class="top-bar"><span style="width:${Math.max(6, Math.round(o.count / max * 100))}%; background:${(CAT[o.cat] || {}).color || 'var(--accent)'}"></span></div>
+          </li>`).join('')}
+        </ol>
+      </section>
+      <section class="stat-panel" aria-label="Динамика оценок">
+        <h4 class="section-label">Динамика оценок</h4>
+        ${dynamicsHTML(st.series)}
+      </section>
+    </div>`;
+}
+
 function renderLog() {
   const root = $('#screen-log');
-  const log = state.log;
-  if (!log.length) {
+  if (!state.log.length) {
     root.innerHTML = `
       <div class="max-w-md mx-auto text-center panel rounded-[24px] p-10">
         <div class="hz text-6xl accent opacity-70">記</div>
@@ -2345,32 +2596,85 @@ function renderLog() {
       </div>`;
     return;
   }
-  const freq = {};
-  log.forEach(e => { freq[e.teaId] = (freq[e.teaId] || 0) + 1; });
-  const favId = Object.keys(freq).sort((a, b) => freq[b] - freq[a])[0];
-  const favName = TEA_BY_ID[favId] ? escapeHtml(splitParen(TEA_BY_ID[favId].name_ru)[0]) : '—';
-  const totalSteeps = log.reduce((a, e) => a + (e.steepsDone || 0), 0);
-  const rated = log.filter(e => e.rating);
-  const avg = rated.length ? (rated.reduce((a, e) => a + e.rating, 0) / rated.length).toFixed(1) : '—';
+  const teas = new Map();
+  for (const e of state.log) {
+    const o = teas.get(e.teaId) || { name: splitParen(e.teaName)[0], count: 0 };
+    o.count++;
+    teas.set(e.teaId, o);
+  }
+  const f = state.logFilter;
+  if (f.tea && !teas.has(f.tea)) f.tea = '';
+  const opts = (items, cur) => items.map(([v, l]) => `<option value="${escapeHtml(v)}" ${v === cur ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('');
+  const teaItems = [['', 'Все сорта'], ...[...teas].sort((a, b) => b[1].count - a[1].count || a[1].name.localeCompare(b[1].name, 'ru')).map(([id, o]) => [id, `${o.name} (${o.count})`])];
+  const today = new Date().toISOString().slice(0, 10);
 
   root.innerHTML = `
     <div class="max-w-4xl mx-auto">
-      <div class="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <div class="step-kicker">茶记 · Чай Цзи</div>
-          <h2 class="serif text-[2.2rem] leading-tight font-semibold">Чайный дневник</h2>
+      <div class="step-kicker">茶记 · Чай Цзи</div>
+      <h2 class="serif text-[2.2rem] leading-tight font-semibold">Чайный дневник</h2>
+
+      <div class="log-filters panel" id="log-filters" role="group" aria-label="Фильтры дневника">
+        <div class="fld"><label for="lf-tea">Сорт</label><select id="lf-tea" class="field">${opts(teaItems, f.tea)}</select></div>
+        <div class="fld"><label for="lf-rating">Оценка</label><select id="lf-rating" class="field">${opts(LOG_RATINGS, f.rating)}</select></div>
+        <div class="fld"><label for="lf-period">Период</label><select id="lf-period" class="field">${opts(LOG_PERIODS, f.period)}</select></div>
+        <div class="fld log-dates" id="lf-dates" hidden>
+          <div class="fld-row">
+            <input type="date" id="lf-from" class="field" aria-label="Дата начала" max="${today}" value="${escapeHtml(f.from)}">
+            <span class="fld-unit">—</span>
+            <input type="date" id="lf-to" class="field" aria-label="Дата окончания" max="${today}" value="${escapeHtml(f.to)}">
+          </div>
         </div>
+        <button type="button" class="btn-ghost" id="lf-reset" data-action="log-filter-reset" hidden>Сбросить</button>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
-        <div class="stat"><div class="k">Чаепитий</div><div class="v text-lg">${log.length}</div></div>
-        <div class="stat"><div class="k">Проливов</div><div class="v text-lg">${totalSteeps}</div></div>
-        <div class="stat"><div class="k">Средняя оценка</div><div class="v text-lg">${avg}</div></div>
-        <div class="stat"><div class="k">Любимый</div><div class="v text-sm truncate" style="font-family:inherit">${favName}</div></div>
-      </div>
-      <div class="mt-5 space-y-3">
-        ${log.map(logEntryHTML).join('')}
-      </div>
+
+      <div id="log-body"></div>
     </div>`;
+  renderLogBody();
+}
+
+function renderLogBody() {
+  const body = $('#log-body');
+  if (!body) return;
+  const f = state.logFilter;
+  const active = logFilterActive(f);
+  $('#lf-reset').hidden = !active;
+  $('#lf-dates').hidden = f.period !== 'custom';
+  const list = filteredLog().sort(byDateDesc);
+  if (!list.length) {
+    body.innerHTML = `
+      <div class="empty panel mt-5">
+        <div class="hz text-4xl text-dim">空</div>
+        <p class="serif text-2xl mt-3">Записей по этим фильтрам нет</p>
+        <p class="text-sm text-sage mt-1">Измените сорт, оценку или период.</p>
+        <button type="button" class="btn-ghost mt-5" data-action="log-filter-reset">Сбросить фильтры</button>
+      </div>`;
+    return;
+  }
+  body.innerHTML = `
+    <h3 class="section-label mt-6">Статистика${active ? ' · по выбранным записям' : ''}</h3>
+    ${statsHTML(logStats(list))}
+    <div class="mt-7 flex items-baseline justify-between gap-3">
+      <h3 class="section-label">Записи</h3>
+      <span class="text-[12px] text-dim mono" aria-live="polite">${list.length} из ${state.log.length}</span>
+    </div>
+    <div class="mt-3 space-y-3">${list.map(logEntryHTML).join('')}</div>`;
+}
+
+function onLogFilterChange(el) {
+  const f = state.logFilter;
+  if (el.id === 'lf-tea') f.tea = el.value;
+  else if (el.id === 'lf-rating') f.rating = el.value;
+  else if (el.id === 'lf-period') { f.period = el.value; if (f.period !== 'custom') { f.from = ''; f.to = ''; } }
+  else if (el.id === 'lf-from') f.from = el.value;
+  else if (el.id === 'lf-to') f.to = el.value;
+  renderLogBody();
+}
+
+function resetLogFilter() {
+  state.logFilter = emptyLogFilter();
+  renderLog();
+  const first = $('#lf-tea');
+  if (first) first.focus({ preventScroll: true });
 }
 
 function logEntryHTML(e) {
@@ -2615,6 +2919,8 @@ function deleteCustomTea(id) {
   if (!confirm(`Удалить сорт «${splitParen(t.name_ru)[0]}»? Записи в дневнике сохранятся.`)) return;
   customTeas = customTeas.filter(x => x.id !== id);
   saveCustomTeas();
+  favorites = favorites.filter(x => x !== id);
+  saveFavorites();
   rebuildTeas();
   closeModal();
   if (state.selectedId === id) state.selectedId = (TEAS.find(x => x.categoryId === t.categoryId) || TEAS[0]).id;
@@ -2710,6 +3016,10 @@ document.addEventListener('click', e => {
     case 'all-categories': showAllCategories(); break;
     case 'toggle-info':    setInfoOpen(!$('#material-info').classList.contains('open')); break;
     case 'toggle-curve-info': toggleCurveInfo(el); break;
+    case 'toggle-vessel':  state.vesselOpen = !state.vesselOpen; updateVesselUI(); break;
+    case 'toggle-fav':     toggleFavorite(el.dataset.id); break;
+    case 'toggle-fav-all': state.favExpanded = !state.favExpanded; renderCatalog(); break;
+    case 'log-filter-reset': resetLogFilter(); break;
     case 'new-tea':        openTeaEditor(null, el.dataset.cat); break;
     case 'edit-tea':       openTeaEditor(el.dataset.id); break;
     case 'tea-reset':      resetTeaOverrides(el.dataset.id); break;
@@ -2755,6 +3065,7 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   if (e.target.name === 'needs_rinse') { $('#te-rinse_sec').disabled = !e.target.checked; }
   if (e.target.closest && e.target.closest('#tea-form')) updateTeaPreview();
+  if (e.target.closest && e.target.closest('#log-filters')) onLogFilterChange(e.target);
 });
 
 $('#vol-range').addEventListener('input', e => setVolume(e.target.value));
