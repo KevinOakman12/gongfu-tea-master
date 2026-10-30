@@ -354,11 +354,12 @@
       border-radius: 22px 22px 0 0;
       background: var(--bg-secondary);
       box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
-      transform: translateY(105%);
-      transition: transform .45s var(--ease);
+      transform: translateY(calc(100% + 160px));
+      visibility: hidden;
+      transition: transform .45s var(--ease), visibility 0s linear .45s;
       padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
     }
-    #detail.open { transform: none; }
+    #detail.open { transform: none; visibility: visible; transition: transform .45s var(--ease), visibility 0s; }
   }
   @media (min-width: 1024px) {
     #detail { position: sticky; top: 84px; max-height: calc(100vh - 104px); overflow-y: auto; }
