@@ -63,6 +63,12 @@
     --tea-white-bg: #33332A;
     --tea-green-bg: #223224;
     --tea-yellow-bg: #373019;
+    --tea-gaba: #A08FA8;
+    --tea-gaba-bg: #2E2A33;
+    --tea-sheng: #8E9A5B;
+    --tea-sheng-bg: #2B3022;
+    --tea-hei: #8E7A6A;
+    --tea-hei-bg: #2D2723;
     --on-accent: #1B211D;
     color-scheme: dark;
     --ease: cubic-bezier(.2, .8, .2, 1);
@@ -408,6 +414,7 @@
   .chart .bar.dip { background: linear-gradient(180deg, var(--info), color-mix(in srgb, var(--info) 25%, transparent)); }
   .chart .bar.rinse { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--text-muted) 60%, transparent) 0 3px, color-mix(in srgb, var(--text-muted) 18%, transparent) 3px 6px); }
   .chart .val { position: absolute; bottom: calc(100% + 3px); left: 50%; transform: translateX(-50%); font-size: .58rem; color: var(--text-muted); white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
+  .chart.dense .col:nth-child(even) .val { display: none; }
   .chart .idx { font-size: .6rem; color: var(--text-muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
   @keyframes barGrow { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
   .legend-sw { display: inline-block; width: .55rem; height: .55rem; border-radius: 2px; }
@@ -756,433 +763,1225 @@
    1. КАТЕГОРИИ
    ════════════════════════════════════════════════════════════════════ */
 const CATEGORIES = [
-  { id: 'puerh_heicha', short: 'Пуэры и Хэй Ча', color: 'var(--tea-puer)',         bg: 'var(--tea-puer-bg)',         glyph: '普', desc: 'Густые, землистые и выдержанные',               temp: '95–100°C' },
-  { id: 'oolong_light', short: 'Светлые улуны',  color: 'var(--tea-light-oolong)', bg: 'var(--tea-light-oolong-bg)', glyph: '清', desc: 'Цветочные, сливочные и свежие',                 temp: '85–95°C' },
-  { id: 'oolong_dark',  short: 'Тёмные улуны',   color: 'var(--tea-dark-oolong)',  bg: 'var(--tea-dark-oolong-bg)',  glyph: '岩', desc: 'Прожаренные, минеральные и пряные',             temp: '90–100°C' },
-  { id: 'red_tea',      short: 'Красный чай',    color: 'var(--tea-red)',          bg: 'var(--tea-red-bg)',          glyph: '红', desc: 'Медовые, фруктовые и согревающие',              temp: '85–95°C' },
-  { id: 'white_tea',    short: 'Белый чай',      color: 'var(--tea-white)',        bg: 'var(--tea-white-bg)',        glyph: '白', desc: 'Нежные, воздушные и постепенно раскрывающиеся', temp: '80–90°C' },
-  { id: 'green_tea',    short: 'Зелёный чай',    color: 'var(--tea-green)',        bg: 'var(--tea-green-bg)',        glyph: '绿', desc: 'Свежие, травянистые и деликатные',              temp: '78–85°C' },
-  { id: 'yellow_tea',   short: 'Жёлтый чай',     color: 'var(--tea-yellow)',       bg: 'var(--tea-yellow-bg)',       glyph: '黄', desc: 'Мягкие, томлёные и ореховые',                   temp: 'около 85°C' }
+  { id: 'green_tea',    short: 'Зелёный чай',    color: 'var(--tea-green)',        bg: 'var(--tea-green-bg)',        glyph: '绿', desc: 'Свежие, травянистые и деликатные' },
+  { id: 'white_tea',    short: 'Белый чай',      color: 'var(--tea-white)',        bg: 'var(--tea-white-bg)',        glyph: '白', desc: 'Нежные, воздушные и постепенно раскрывающиеся' },
+  { id: 'yellow_tea',   short: 'Жёлтый чай',     color: 'var(--tea-yellow)',       bg: 'var(--tea-yellow-bg)',       glyph: '黄', desc: 'Мягкие, томлёные и ореховые' },
+  { id: 'oolong_light', short: 'Светлый улун',   color: 'var(--tea-light-oolong)', bg: 'var(--tea-light-oolong-bg)', glyph: '清', desc: 'Цветочные, сливочные и свежие' },
+  { id: 'oolong_dark',  short: 'Тёмный улун',    color: 'var(--tea-dark-oolong)',  bg: 'var(--tea-dark-oolong-bg)',  glyph: '岩', desc: 'Прожаренные, минеральные и пряные' },
+  { id: 'gaba_tea',     short: 'Габа чай',       color: 'var(--tea-gaba)',         bg: 'var(--tea-gaba-bg)',         glyph: '佳', desc: 'Сладкие, ягодные и мягкие' },
+  { id: 'red_tea',      short: 'Красный чай',    color: 'var(--tea-red)',          bg: 'var(--tea-red-bg)',          glyph: '红', desc: 'Медовые, фруктовые и согревающие' },
+  { id: 'sheng_puer',   short: 'Шэн Пуэр',       color: 'var(--tea-sheng)',        bg: 'var(--tea-sheng-bg)',        glyph: '生', desc: 'Яркие, терпкие и раскрывающиеся с годами' },
+  { id: 'shu_puer',     short: 'Шу Пуэр',        color: 'var(--tea-puer)',         bg: 'var(--tea-puer-bg)',         glyph: '熟', desc: 'Густые, землистые и тёмные' },
+  { id: 'hei_cha',      short: 'Хэй Ча',         color: 'var(--tea-hei)',          bg: 'var(--tea-hei-bg)',          glyph: '黑', desc: 'Глубокие, древесные и мягкие' }
 ];
 const CAT = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 
 /* ════════════════════════════════════════════════════════════════════
-   2. БАЗА ДАННЫХ: 36 сортов (расчёт на 100 мл воды, фарфор)
+   2. БАЗА ДАННЫХ: 106 сортов из таблиц магазина, метод проливов
+   Тайминги — жёстко заданный массив steep_times (секунды на пролив);
+   rinse_sec — время «нулевого» пролива (промывки). Граммовка пересчитана
+   из «1 г на N мл» в г на 100 мл. Если в таблице указано «и т. д.»,
+   массив продолжен последним значением до максимума проливов (max_steeps).
+   Диапазон температуры: temp_c — нижняя граница, temp_max — верхняя.
    ════════════════════════════════════════════════════════════════════ */
 const TEA_DATABASE = [
-  /* ── Категория 1: Пуэры и Хэй Ча ── */
+  /* ── Белый чай (из PDF «white_tea») ── */
   {
-    id: "shu-puer-cake",
-    name_ru: "Шу Пуэр (Прессованный блин / кирпич)",
-    name_cn: "熟普洱 (Shú Pǔ'ěr)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "pressed", temp_c: 98, grams_per_100ml: 7.0,
-    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 45,
-    base_sec: 12, step_sec: 8, max_steeps: 10, open_lid_warning: false,
-    flavor_tags: ["древесный", "ореховый", "влажная кора", "темный шоколад"],
-    brewing_tip: "После промывки дайте листу подышать в закрытой горячей посуде. 2-й и 3-й проливы сливайте быстро, комок уже распался!"
-  },
-  {
-    id: "shu-gongting",
-    name_ru: "Шу Пуэр Гунтин (Дворцовый рассыпной)",
-    name_cn: "宫廷熟普 (Gōngtíng Shú Pǔ)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "loose", temp_c: 98, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
-    base_sec: 6, step_sec: 6, max_steeps: 9, open_lid_warning: false,
-    flavor_tags: ["горький шоколад", "чернослив", "торф", "сливочность"],
-    brewing_tip: "Мелкая почка отдает вкус мгновенно. Первые 3 пролива делайте буквально на пролив, чтобы не уйти в густую «нефть»."
-  },
-  {
-    id: "lao-cha-tou",
-    name_ru: "Лао Ча Тоу (Старые чайные головы)",
-    name_cn: "老茶头 (Lǎo Chá Tóu)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "pressed", temp_c: 100, grams_per_100ml: 7.0,
-    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 60,
-    base_sec: 20, step_sec: 10, max_steeps: 14, open_lid_warning: false,
-    flavor_tags: ["грецкий орех", "карамель", "осенний лес", "финики"],
-    brewing_tip: "Плотные узелки, скрепленные пектином. Требуют крутого кипятка (100°C) и самой долгой промывки. Невероятно живучий чай."
-  },
-  {
-    id: "xiao-qing-gan",
-    name_ru: "Сяо Цин Гань (Шу пуэр в зеленом мандарине)",
-    name_cn: "小青柑 (Xiǎo Qīng Gān)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "pressed", temp_c: 98, grams_per_100ml: 6.5,
-    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
-    base_sec: 15, step_sec: 8, max_steeps: 12, open_lid_warning: false,
-    flavor_tags: ["цедра лайма", "эфирные масла", "древесность", "свежесть"],
-    brewing_tip: "Проколите мандарин шилом в нескольких местах или слегка надломите края, чтобы вода проходила сквозь пуэр внутри."
-  },
-  {
-    id: "sheng-young",
-    name_ru: "Шэн Пуэр (Молодой, 1–4 года)",
-    name_cn: "生普洱 (Shēng Pǔ'ěr)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "loose", temp_c: 88, grams_per_100ml: 5.5,
-    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 20,
-    base_sec: 7, step_sec: 5, max_steeps: 9, open_lid_warning: true,
-    flavor_tags: ["курага", "луговые травы", "яблочная кислинка", "дымок"],
-    brewing_tip: "Не используйте крутой кипяток и не закрывайте крышку гайвани после слива, иначе чай запарится и даст резкую терпкость."
-  },
-  {
-    id: "lao-sheng",
-    name_ru: "Шэн Пуэр (Выдержанный Лао Шэн, 7+ лет)",
-    name_cn: "老生普洱 (Lǎo Shēng Pǔ'ěr)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "pressed", temp_c: 96, grams_per_100ml: 6.5,
-    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 45,
-    base_sec: 10, step_sec: 7, max_steeps: 12, open_lid_warning: false,
-    flavor_tags: ["камфора", "сухофрукты", "старое дерево", "медовая сладость"],
-    brewing_tip: "Возрастной шэн любит горячую воду. Обратите внимание на долгое сладкое послевкусие (Хуэй Гань) на 4–5 проливе."
-  },
-  {
-    id: "liu-bao-fu-zhuan",
-    name_ru: "Лю Бао / Фу Чжуань (Хэй Ча с «золотыми цветами»)",
-    name_cn: "六堡茶 / 茯砖茶 (Liùbǎo Chá / Fúzhuān Chá)",
-    categoryId: "puerh_heicha", categoryName: "Пуэры и Хэй Ча",
-    curve_type: "pressed", temp_c: 98, grams_per_100ml: 6.5,
-    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 40,
-    base_sec: 12, step_sec: 8, max_steeps: 10, open_lid_warning: false,
-    flavor_tags: ["белые грибы", "сдоба", "погребок", "мягкая сладость"],
-    brewing_tip: "Очень мягкий для желудка постферментированный чай. Не боится передержки и крутого кипятка."
-  },
-
-  /* ── Категория 2: Светлые и Тайваньские Улуны ── */
-  {
-    id: "tgy-qing-xiang",
-    name_ru: "Те Гуань Инь (Цин Сян — слабый огонь)",
-    name_cn: "铁观音 (Tiě Guānyīn)",
-    categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
-    curve_type: "rolled", temp_c: 90, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 30,
-    base_sec: 15, step_sec: 8, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["сирень", "орхидея", "свежескошенная трава", "сливочность"],
-    brewing_tip: "На 2-м проливе тугие шарики развернутся во всю гайвань — таймер специально уменьшит время, чтобы настой остался нежным."
-  },
-  {
-    id: "tgy-nong-xiang",
-    name_ru: "Те Гуань Инь (Нун Сян — печеный / традиционный)",
-    name_cn: "浓香铁观音 (Nóngxiāng Tiě Guānyīn)",
-    categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
-    curve_type: "rolled", temp_c: 95, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 40,
-    base_sec: 15, step_sec: 8, max_steeps: 9, open_lid_warning: false,
-    flavor_tags: ["печеное яблоко", "карамель", "орехи", "теплая выпечка"],
-    brewing_tip: "Благодаря угольной прожарке требует более горячей воды (95°C) и отлично подходит для вечернего расслабления."
-  },
-  {
-    id: "gaba-oolong",
-    name_ru: "ГАБА Улун (Алишань / Мэйшань)",
-    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
-    categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
-    curve_type: "rolled", temp_c: 94, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 35,
-    base_sec: 18, step_sec: 10, max_steeps: 9, open_lid_warning: false,
-    flavor_tags: ["печеная тыква", "ягодная кислинка", "ржаной хлеб", "мед"],
-    brewing_tip: "ГАБА-чай отлично держит долгие экспозиции на поздних проливах, не уходя в горечь. Идеален для спокойного фокуса."
-  },
-  {
-    id: "dong-ding",
-    name_ru: "Дун Дин (Улун с Морозного Пика)",
-    name_cn: "冻顶乌龙 (Dòngdǐng Wūlóng)",
-    categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
-    curve_type: "rolled", temp_c: 94, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 35,
-    base_sec: 16, step_sec: 8, max_steeps: 9, open_lid_warning: false,
-    flavor_tags: ["лесной орех", "сливочный ирис", "тропические фрукты"],
-    brewing_tip: "Обязательно понюхайте остывающую крышку гайвани после первого и второго пролива — там самый богатый букет."
-  },
-  {
-    id: "alishan-jin-xuan",
-    name_ru: "Алишань Цзинь Сюань (Золотой лилейник)",
-    name_cn: "阿里山金萱 (Ālǐshān Jīnxuān)",
-    categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
-    curve_type: "rolled", temp_c: 90, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
-    base_sec: 15, step_sec: 8, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["натуральные сливки", "цветы османтуса", "сладкая кукуруза"],
-    brewing_tip: "Культивар Цзинь Сюань дает природную молочно-сливочную текстуру без всяких ароматизаторов."
-  },
-  {
-    id: "nai-xiang-jin-xuan",
-    name_ru: "Най Сян Цзинь Сюань (Молочный улун)",
-    name_cn: "奶香金萱 (Nǎixiāng Jīnxuān)",
-    categoryId: "oolong_light", categoryName: "Светлые и Тайваньские Улуны",
-    curve_type: "rolled", temp_c: 88, grams_per_100ml: 5.5,
-    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 20,
-    base_sec: 14, step_sec: 8, max_steeps: 7, open_lid_warning: false,
-    flavor_tags: ["сгущенное молоко", "пломбир", "карамель", "луговые цветы"],
-    brewing_tip: "Не заваривайте крутым кипятком (максимум 88°C), чтобы сливочный аромат уходил в воду плавно, а не выгорал на старте."
-  },
-
-  /* ── Категория 3: Темные Улуны (Уишань и Гуандун) ── */
-  {
-    id: "da-hong-pao",
-    name_ru: "Да Хун Пао (Большой Красный Халат)",
-    name_cn: "大红袍 (Dà Hóng Páo)",
-    categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
-    curve_type: "loose", temp_c: 95, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 40,
-    base_sec: 8, step_sec: 7, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["корочка ржаного хлеба", "темный шоколад", "дым", "минералы"],
-    brewing_tip: "Продольная скрутка отдает вкус сразу. Первые проливы делайте короткими, чтобы поймать «утесную мелодию» (Янь Юнь) без горечи."
-  },
-  {
-    id: "wuyi-rou-gui",
-    name_ru: "Уи Жоу Гуй (Корица с гор Уи)",
-    name_cn: "武夷肉桂 (Wǔyí Ròuguì)",
-    categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
-    curve_type: "loose", temp_c: 96, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 40,
-    base_sec: 7, step_sec: 7, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["кора корицы", "персик", "древесный уголь", "пряная острота"],
-    brewing_tip: "Яркий и дерзкий утесный чай. Лейте воду тонкой струей по стенке гайвани, не бейте струей прямо в лист."
-  },
-  {
-    id: "wuyi-shui-xian",
-    name_ru: "Уи Шуй Сянь (Водный Бессмертный)",
-    name_cn: "武夷水仙 (Wǔyí Shuǐxiān)",
-    categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
-    curve_type: "loose", temp_c: 95, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 40,
-    base_sec: 9, step_sec: 8, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["мокрый камень", "орхидея", "старое дерево", "мох"],
-    brewing_tip: "Шуй Сянь дает более плотное, «маслянистое» тело настоя, чем Жоу Гуй. Отлично раскрывается в глиняном чайнике."
-  },
-  {
-    id: "feng-huang-dan-cong",
-    name_ru: "Фэн Хуан Дань Цун (Одиночные кусты с гор Феникса)",
-    name_cn: "凤凰单丛 (Fènghuáng Dāncóng)",
-    categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
-    curve_type: "loose", temp_c: 90, grams_per_100ml: 5.5,
+    id: "white_tea-yue-guan-bay-2021-g",
+    name_ru: "Юэ Гуан Бай (2021 г.)",
+    name_cn: "月光白 (Yuèguāng Bái)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
-    base_sec: 5, step_sec: 5, max_steeps: 9, open_lid_warning: true,
-    flavor_tags: ["личи", "грейпфрут", "медовая орхидея", "имбирь"],
-    brewing_tip: "Самый капризный улун! Заваривайте методом «залил — сразу слил» (флеш-проливы). Чуть передержите — появится сильная терпкость."
+    steep_times: [7, 7, 9, 15, 30, 60, 120, 120, 120, 120], max_steeps: 10, open_lid_warning: false,
+    flavor_tags: ["мёд", "спелый абрикос", "луговые травы", "лёгкая пряность"],
+    brewing_tip: "Листья Юэ Гуан Бай бело-чёрные, настой мягкий и сладкий. Первые проливы очень короткие, потом время быстро растёт ступенями — не прибавляйте секунд «на глаз», иначе вылезет терпкость."
   },
   {
-    id: "hong-oolong",
-    name_ru: "Хун Улун (Красный сильноферментированный улун)",
-    name_cn: "红乌龙 (Hóng Wūlóng)",
-    categoryId: "oolong_dark", categoryName: "Темные Улуны (Уишань и Гуандун)",
-    curve_type: "rolled", temp_c: 95, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 35,
-    base_sec: 15, step_sec: 10, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["спелая слива", "печеный персик", "карамель", "бисквит"],
-    brewing_tip: "Сочетает плотность красного чая со стойкостью сферического улуна. Очень прощает ошибки в заваривании."
+    id: "white_tea-yue-guan-bay-2025-g",
+    name_ru: "Юэ Гуан Бай (2025 г.)",
+    name_cn: "月光白 (Yuèguāng Bái)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
+    steep_times: [8, 8, 10, 15, 30, 60, 120, 120, 120, 120], max_steeps: 10, open_lid_warning: false,
+    flavor_tags: ["мёд", "спелый абрикос", "луговые травы", "лёгкая пряность"],
+    brewing_tip: "Листья Юэ Гуан Бай бело-чёрные, настой мягкий и сладкий. Первые проливы очень короткие, потом время быстро растёт ступенями — не прибавляйте секунд «на глаз», иначе вылезет терпкость."
+  },
+  {
+    id: "white_tea-bay-tszyan",
+    name_ru: "Бай Цзянь",
+    name_cn: "",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [9, 9, 12, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["луговое разнотравье", "груша", "абрикосовая косточка", "мёд"],
+    brewing_tip: "Почка и два листа: насыпайте рыхло, лист объёмный. Первые проливы короткие, дальше время растёт скачками — придерживайтесь таймера."
+  },
+  {
+    id: "white_tea-bay-khao-in-chzhen",
+    name_ru: "Бай Хао Ин Чжень",
+    name_cn: "白毫银针 (Báiháo Yínzhēn)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [9, 9, 12, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: true,
+    flavor_tags: ["берёзовый сок", "дыня", "цветущая липа", "родниковая вода"],
+    brewing_tip: "Серебристый ворс отталкивает воду. Лейте тонкой струёй по стенке, не взбалтывайте лист и держите крышку приоткрытой — почка не любит перегрева."
+  },
+  {
+    id: "white_tea-lao-bay-mudan",
+    name_ru: "Лао Бай Мудань",
+    name_cn: "老白牡丹 (Lǎo Bái Mǔdān)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["сухофрукты", "финики", "пряные травы", "старый мёд"],
+    brewing_tip: "Выдержанный белый чай заваривают горячей водой, но не выше 80°C из таблицы — иначе проступит терпкость. Аромат выдержки лучше всего слышен с крышки после промывки."
+  },
+  {
+    id: "white_tea-bay-mudan-press",
+    name_ru: "Бай Мудань пресс",
+    name_cn: "白牡丹 (Bái Mǔdān)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [8, 7, 9, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["луговое разнотравье", "груша", "абрикосовая косточка", "мёд"],
+    brewing_tip: "Прессованный белый чай раскрывается постепенно: не крошите блин, а лишь слегка отделите пласт. Промывка и прогрев нужны, чтобы блин «проснулся»."
+  },
+  {
+    id: "white_tea-ya-bao-belyy-puer",
+    name_ru: "Я Бао (белый Пуэр)",
+    name_cn: "",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [9, 9, 12, 15, 30, 60, 120, 120, 120, 120, 120], max_steeps: 11, open_lid_warning: false,
+    flavor_tags: ["сладкое сено", "мёд", "цветочная пыльца", "свежий лист"],
+    brewing_tip: "Нежный белый чай из почек: вода 80°C, без спешки в первых проливах. Дайте листу раскрыться и слушайте аромат с крышки."
+  },
+  {
+    id: "white_tea-lao-shou-mey",
+    name_ru: "Лао Шоу Мэй",
+    name_cn: "老寿眉 (Lǎo Shòuméi)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [6, 6, 9, 15, 30, 60, 120, 120, 120, 120], max_steeps: 10, open_lid_warning: false,
+    flavor_tags: ["узвар из сухофруктов", "осенняя листва", "шиповник", "мёд"],
+    brewing_tip: "Крупный выдержанный лист даёт плотный янтарный настой. Следуйте таймеру: проливы после 5-го быстро становятся длиннее, и чай остаётся мягким."
+  },
+  {
+    id: "white_tea-lao-shou-mey-spressovannyy",
+    name_ru: "Лао Шоу Мэй спрессованный",
+    name_cn: "老寿眉 (Lǎo Shòuméi)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 30,
+    steep_times: [7, 7, 10, 15, 30, 60, 120, 120, 120, 120], max_steeps: 10, open_lid_warning: false,
+    flavor_tags: ["узвар из сухофруктов", "старое дерево", "шиповник", "мёд"],
+    brewing_tip: "Спрессованный выдержанный чай: слегка отделите пласт, не разбивайте его в крошку. Первую промывку делайте дольше, чтобы блин раскрылся."
+  },
+  {
+    id: "white_tea-monetka-shou-mey-s-zhasminom",
+    name_ru: "Монетка Шоу Мэй с жасмином",
+    name_cn: "",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 30,
+    steep_times: [7, 7, 10, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["жасмин", "мёд", "сухофрукты", "цветочная сладость"],
+    brewing_tip: "Прессованная «монетка» с жасмином: цветочный аромат нежный, поэтому не перегревайте воду. Дайте монетке раскрыться на промывке и слушайте аромат с крышки."
+  },
+  {
+    id: "white_tea-shou-mey-zhemchuzhina",
+    name_ru: "Шоу Мэй жемчужина",
+    name_cn: "寿眉 (Shòuméi)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 30,
+    steep_times: [7, 7, 10, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["осенняя листва", "шарлотка с яблоками", "шиповник", "мёд"],
+    brewing_tip: "Шарик раскрывается постепенно, поэтому первые проливы короче, а затем время растёт. Хорошо прогрейте посуду перед засыпкой."
+  },
+  {
+    id: "white_tea-yue-guan-bay-zhemchuzhina",
+    name_ru: "Юэ Гуан Бай жемчужина",
+    name_cn: "月光白 (Yuèguāng Bái)",
+    categoryId: "white_tea", categoryName: "Белый чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 30,
+    steep_times: [7, 7, 10, 15, 30, 60, 120, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["мёд", "абрикос", "цветочный нектар", "сухая трава"],
+    brewing_tip: "Скрученная «жемчужина» раскрывается медленно. Хорошо прогрейте её на промывке и подержите дыханием в закрытой посуде — дальше чай идёт ровно."
   },
 
-  /* ── Категория 4: Красный чай ── */
+  /* ── Габа чай (из PDF «gaba_tea») ── */
   {
-    id: "dian-hong",
-    name_ru: "Дянь Хун (Крупнолистовой классический)",
-    name_cn: "滇红工夫 (Diānhóng Gōngfu)",
-    categoryId: "red_tea", categoryName: "Красный чай",
-    curve_type: "loose", temp_c: 90, grams_per_100ml: 5.0,
-    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 25,
-    base_sec: 10, step_sec: 8, max_steeps: 7, open_lid_warning: false,
-    flavor_tags: ["гречишный мед", "курага", "солод", "ржаная корочка"],
-    brewing_tip: "Не заваривайте красный чай крутым кипятком (100°C)! Вода 88–90°C раскроет медовую сладость и уберет вяжущую кислоту."
+    id: "gaba_tea-gaba-svetlyy-ulun-krasnyy-korall",
+    name_ru: "Габа светлый улун Красный коралл",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
   },
   {
-    id: "dian-hong-jin-ya",
-    name_ru: "Дянь Хун Цзинь Я (Золотые почки Юньнани)",
-    name_cn: "滇红金芽 (Diānhóng Jīnyá)",
-    categoryId: "red_tea", categoryName: "Красный чай",
-    curve_type: "loose", temp_c: 85, grams_per_100ml: 5.0,
-    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 20,
-    base_sec: 8, step_sec: 7, max_steeps: 7, open_lid_warning: true,
-    flavor_tags: ["курага", "цветочный нектар", "какао-масло", "бархатистость"],
-    brewing_tip: "Чистая ворсистая почка очень нежная. Используйте остывшую воду (85°C) и снимайте крышку между проливами."
+    id: "gaba_tea-gaba-svetlyy-ulun-vulkanicheskiy",
+    name_ru: "Габа светлый улун Вулканический",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [6, 6, 9, 17, 32, 50, 70, 90, 90, 90, 90, 90, 90], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
   },
   {
-    id: "jin-jun-mei",
-    name_ru: "Цзинь Цзюнь Мэй (Золотые брови)",
-    name_cn: "金骏眉 (Jīn Jùn Méi)",
-    categoryId: "red_tea", categoryName: "Красный чай",
-    curve_type: "loose", temp_c: 85, grams_per_100ml: 4.5,
-    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 20,
-    base_sec: 8, step_sec: 7, max_steeps: 8, open_lid_warning: true,
-    flavor_tags: ["цветочный мед", "сладкий батат", "тропические фрукты"],
-    brewing_tip: "Высокогорный фуцзяньский чай из крошечных весенних почек. Дает невероятно чистый, прозрачный и сладкий настой."
+    id: "gaba_tea-gaba-svetlyy-ulun-s-dikim-medom",
+    name_ru: "Габа светлый улун с диким медом",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 1, warm_breath_sec: 30,
+    steep_times: [7, 7, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
   },
   {
-    id: "zheng-shan-xiao-zhong",
+    id: "gaba_tea-gaba-te-guan-in",
+    name_ru: "Габа Те Гуань Инь",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["орхидея", "мёд", "сливочность", "спелые ягоды"],
+    brewing_tip: "Те Гуань Инь в габа-обработке мягче классического и заметно слаще. Вода 85°C, короткие первые проливы; послевкусие раскрывается к 4–5 проливу."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-bazalt",
+    name_ru: "Габа светлый улун Базальт",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [4, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-sapfir",
+    name_ru: "Габа светлый улун Сапфир",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-yantar",
+    name_ru: "Габа светлый улун Янтарь",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-zelenaya-yashma",
+    name_ru: "Габа светлый улун Зеленая Яшма",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-zolotaya",
+    name_ru: "Габа светлый улун Золотая",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [6, 6, 9, 17, 32, 50, 70, 90, 90, 90, 90, 90, 90], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-alishan",
+    name_ru: "Габа светлый улун Алишань",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-diabaz",
+    name_ru: "Габа светлый улун Диабаз",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-izumrud",
+    name_ru: "Габа светлый улун Изумруд",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-svetlyy-ulun-korol",
+    name_ru: "Габа светлый улун Король",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
+    steep_times: [7, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90, 90, 90], max_steeps: 15, open_lid_warning: false,
+    flavor_tags: ["ягодная кислинка", "медовая сладость", "печёная тыква", "цветочный шлейф"],
+    brewing_tip: "Габа-улун проходит выдержку без кислорода — отсюда сладость и ягодные ноты. Держите воду 85°C: горячее даёт терпкость, холоднее — пресный вкус. С 4-го пролива время растёт быстро, не сокращайте его."
+  },
+  {
+    id: "gaba_tea-gaba-da-khun-pao-vulkanicheskiy",
+    name_ru: "Габа Да Хун Пао Вулканический",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 7, 10, 20, 30, 40, 60, 80, 100, 100, 100, 100], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмный шоколад", "сухофрукты", "минералы", "карамель"],
+    brewing_tip: "Да Хун Пао в габа-обработке: вода 90°C, первые проливы короткие. Тёмные ноты раскрываются к 4–5 проливу, дальше настой становится плотнее."
+  },
+  {
+    id: "gaba_tea-gaba-shu-puer",
+    name_ru: "Габа Шу Пуэр",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["чернослив", "какао", "сладкая древесина", "вишня"],
+    brewing_tip: "Габа-шу пуэр заваривают кипятком (100°C). Промывка 15 с, затем два пролива по 10 с — так настой получается мягким и сладким; дальше время плавно растёт."
+  },
+  {
+    id: "gaba_tea-gaba-belyy-chay-shou-mey",
+    name_ru: "Габа Белый Чай Шоу Мэй",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 25, 30, 60, 120, 120, 120, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["мёд", "сухофрукты", "финики", "пряные травы"],
+    brewing_tip: "Габа-белый чай: вода 80°C. Первые проливы 6–7 с, затем время быстро растёт — не перенастаивайте начало."
+  },
+  {
+    id: "gaba_tea-gaba-belyy-chay-kimberlit",
+    name_ru: "Габа Белый Чай Кимберлит",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [6, 7, 9, 15, 25, 30, 60, 120, 120, 120, 120, 120, 120, 120], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["мёд", "сухофрукты", "финики", "пряные травы"],
+    brewing_tip: "Габа-белый чай: вода 80°C. Первые проливы 6–7 с, затем время быстро растёт — не перенастаивайте начало."
+  },
+  {
+    id: "gaba_tea-gaba-shen-puer",
+    name_ru: "Габа Шен Пуэр",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80], max_steeps: 13, open_lid_warning: true,
+    flavor_tags: ["курага", "яблочная кислинка", "медовая сладость", "дымок"],
+    brewing_tip: "Габа-шэн пуэр: вода 80°C, первые проливы по 3 с. Не закрывайте крышку между проливами, чтобы чай не «запарился» и не стал терпким."
+  },
+  {
+    id: "gaba_tea-gaba-shen-puer-datsit",
+    name_ru: "Габа Шен Пуэр Дацит",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 80, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80, 80], max_steeps: 14, open_lid_warning: true,
+    flavor_tags: ["курага", "яблочная кислинка", "медовая сладость", "дымок"],
+    brewing_tip: "Габа-шэн пуэр: вода 80°C, первые проливы по 3 с. Не закрывайте крышку между проливами, чтобы чай не «запарился» и не стал терпким."
+  },
+  {
+    id: "gaba_tea-gaba-krasnyy-chay-obsidian",
+    name_ru: "Габа Красный чай Обсидиан",
+    name_cn: "",
+    categoryId: "gaba_tea", categoryName: "Габа чай",
+    temp_c: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80, 80], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["мёд", "спелая слива", "какао", "солод"],
+    brewing_tip: "Габа-красный чай: вода 90°C, первые проливы по 3 с. Настой сладкий и плотный; не прибавляйте время сверх таймера."
+  },
+
+  /* ── Жёлтый чай (из PDF «yellow_tea») ── */
+  {
+    id: "yellow_tea-kho-shan-khuan-ya",
+    name_ru: "Хо Шань Хуань Я",
+    name_cn: "霍山黄芽 (Huòshān Huángyá)",
+    categoryId: "yellow_tea", categoryName: "Жёлтый чай",
+    temp_c: 70, temp_max: 75, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [4, 3, 3, 7, 15, 30, 30, 30], max_steeps: 8, open_lid_warning: true,
+    flavor_tags: ["печёный каштан", "сладкие орехи", "тростниковый сахар", "свежая листва"],
+    brewing_tip: "Жёлтый чай мягче зелёного: вода 70–75°C, первые проливы всего 3–4 секунды. Лёгкая выдержка листа даёт ореховую сладость без травянистой резкости."
+  },
+
+  /* ── Зелёный чай (из PDF «green_tea») ── */
+  {
+    id: "green_tea-bi-lo-chun",
+    name_ru: "Би Ло Чунь",
+    name_cn: "碧螺春 (Bìluóchūn)",
+    categoryId: "green_tea", categoryName: "Зелёный чай",
+    temp_c: 70, temp_max: 75, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 2, warm_breath_sec: 30,
+    steep_times: [3, 3, 3, 7, 15, 30, 30, 30], max_steeps: 8, open_lid_warning: true,
+    flavor_tags: ["весенние почки", "свежий горошек", "персиковый цвет", "сладость"],
+    brewing_tip: "Нежнейший ворсистый лист: вода 70–75°C, первые проливы по 3 секунды. Лейте по стенке и держите крышку приоткрытой."
+  },
+  {
+    id: "green_tea-lun-tszin",
+    name_ru: "Лун Цзинь",
+    name_cn: "",
+    categoryId: "green_tea", categoryName: "Зелёный чай",
+    temp_c: 70, temp_max: 75, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 2, warm_breath_sec: 30,
+    steep_times: [4, 4, 4, 7, 15, 30, 30, 30], max_steeps: 8, open_lid_warning: true,
+    flavor_tags: ["жареные семечки", "каштан", "молодая зелень", "умами"],
+    brewing_tip: "Плоский лист лучше раскрывается в широкой гайвани. Вода 70–75°C, первые проливы по 4 секунды; крышку держите приоткрытой."
+  },
+  {
+    id: "green_tea-moli-khua-cha",
+    name_ru: "Моли Хуа Ча",
+    name_cn: "茉莉花茶 (Mòlì Huāchá)",
+    categoryId: "green_tea", categoryName: "Зелёный чай",
+    temp_c: 70, temp_max: 75, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 2, warm_breath_sec: 30,
+    steep_times: [3, 3, 3, 7, 15, 30, 30, 30], max_steeps: 8, open_lid_warning: true,
+    flavor_tags: ["жасмин", "весенний мёд", "свежая зелень", "лёгкая сладость"],
+    brewing_tip: "Не заваривайте кипятком: зелёная основа даст горечь и заглушит цветочный аромат жасмина. Держите 70–75°C."
+  },
+  {
+    id: "green_tea-serebristyy-shelk",
+    name_ru: "Серебристый Шелк",
+    name_cn: "",
+    categoryId: "green_tea", categoryName: "Зелёный чай",
+    temp_c: 70, temp_max: 80, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 2, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 7, 15, 30, 30, 30], max_steeps: 8, open_lid_warning: true,
+    flavor_tags: ["свежая трава", "сладкий горошек", "молодая листва", "лёгкий мёд"],
+    brewing_tip: "В таблице указано 70°C и можно попробовать 80°C: начните с 70°C и повышайте, если вкус кажется пресным."
+  },
+  {
+    id: "green_tea-tay-pin-khou-kuy",
+    name_ru: "Тай Пин Хоу Куй",
+    name_cn: "太平猴魁 (Tàipíng Hóukuí)",
+    categoryId: "green_tea", categoryName: "Зелёный чай",
+    temp_c: 70, temp_max: 75, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 3, 7, 9, 15, 30, 30, 30, 30], max_steeps: 9, open_lid_warning: true,
+    flavor_tags: ["дикая орхидея", "лесная свежесть", "сладкий миндаль", "зелёный лист"],
+    brewing_tip: "Крупные плоские листья лучше раскрываются в широкой гайвани или высоком стакане. Вода 70–75°C."
+  },
+  {
+    id: "green_tea-emeyshan-chzhu-e-tsin",
+    name_ru: "Эмэйшань Чжу Е Цин",
+    name_cn: "峨眉山竹叶青 (Éméishān Zhúyèqīng)",
+    categoryId: "green_tea", categoryName: "Зелёный чай",
+    temp_c: 70, temp_max: 80, grams_per_100ml: 3.3,
+    needs_rinse: true, rinse_sec: 2, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 7, 15, 30, 30, 30], max_steeps: 8, open_lid_warning: true,
+    flavor_tags: ["свежий бамбук", "зелёный горошек", "сладкая трава", "цветочная лёгкость"],
+    brewing_tip: "В таблице 70°C, можно попробовать 80°C: начните с 70°C. Первые проливы короткие, дальше время растёт."
+  },
+
+  /* ── Красный чай (из PDF «red_tea») ── */
+  {
+    id: "red_tea-tszin-khao-dyan-khun",
+    name_ru: "Цзинь Хао Дян Хун",
+    name_cn: "金毫滇红 (Jīnháo Diānhóng)",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [5, 5, 7, 14, 20, 30, 50, 70, 100, 120, 120, 120, 120, 120], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["мёд", "курага", "какао-масло", "солод"],
+    brewing_tip: "Золотистые почки выдерживают горячую воду (90–95°C). Первые проливы короткие; горечь появляется только при передержке, так что следуйте таймеру."
+  },
+  {
+    id: "red_tea-dyan-khun",
+    name_ru: "Дян Хун",
+    name_cn: "滇红 (Diānhóng)",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 14, 20, 30, 50, 70, 100, 120, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["гречишный мёд", "курага", "солод", "ржаная корочка"],
+    brewing_tip: "Классический дянь хун: вода 90–95°C. Медовая сладость раскрывается к 3–4 проливу; поздние проливы идут ровно и сладко."
+  },
+  {
+    id: "red_tea-syue-shan-khun-cha",
+    name_ru: "Сюэ Шань Хун Ча",
+    name_cn: "雪山红茶 (Xuěshān Hóngchá)",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [6, 5, 9, 16, 20, 30, 50, 70, 100, 120, 120, 120, 120, 120], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["цветочный мёд", "сладкий батат", "спелые фрукты", "солод"],
+    brewing_tip: "Красный чай со сладким профилем: вода 90–95°C. Второй пролив чуть короче первого — следуйте таймеру."
+  },
+  {
+    id: "red_tea-tszin-tszyuy-mey",
+    name_ru: "Цзинь Цзюй Мэй",
+    name_cn: "",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 14, 20, 30, 50, 70, 100, 120, 120, 120, 120, 120], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["мёд", "сухофрукты", "карамель", "цветочный нектар"],
+    brewing_tip: "Красный чай любит горячую воду (90–95°C), но не передержку. Следуйте таймеру: после 5-го пролива время растёт быстро, а вкус остаётся сладким."
+  },
+  {
+    id: "red_tea-dyan-khun-press",
+    name_ru: "Дян Хун пресс",
+    name_cn: "滇红 (Diānhóng)",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 16, 20, 30, 50, 70, 100, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["гречишный мёд", "сухофрукты", "солод", "древесность"],
+    brewing_tip: "Прессованный красный чай раскрывается медленнее: не крошите, а слегка отделите пласт. Начальная промывка дольше обычной — блин должен «проснуться»."
+  },
+  {
+    id: "red_tea-dyan-khun-v-forme-pagody",
+    name_ru: "Дян Хун в форме пагоды",
+    name_cn: "滇红 (Diānhóng)",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 16, 20, 30, 50, 70, 100, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["мёд", "курага", "солод", "спелая слива"],
+    brewing_tip: "Чай в форме пагоды раскрывается постепенно: промывка 7 с, первые два пролива по 7 с, затем время растёт."
+  },
+  {
+    id: "red_tea-da-tszi-chzhen",
+    name_ru: "Да Цзи Чжень",
+    name_cn: "",
+    categoryId: "red_tea", categoryName: "Красный чай",
+    temp_c: 90, temp_max: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 6, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 14, 20, 30, 50, 70, 100, 120, 120, 120, 120, 120, 120], max_steeps: 15, open_lid_warning: false,
+    flavor_tags: ["мёд", "сухофрукты", "карамель", "цветочный нектар"],
+    brewing_tip: "Красный чай любит горячую воду (90–95°C), но не передержку. Следуйте таймеру: после 5-го пролива время растёт быстро, а вкус остаётся сладким."
+  },
+  {
+    id: "red_tea-chzhen-shan-syao-chzhun-lapsang-sushong",
     name_ru: "Чжэн Шань Сяо Чжун (Лапсанг Сушонг)",
     name_cn: "正山小种 (Zhèngshān Xiǎozhǒng)",
     categoryId: "red_tea", categoryName: "Красный чай",
-    curve_type: "loose", temp_c: 92, grams_per_100ml: 5.0,
+    temp_c: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 14, 20, 30, 50, 70, 100, 120, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["сосновый дым", "лонган", "чернослив", "смола"],
+    brewing_tip: "Согревающий дымный чай: вода 90°C, первые проливы по 6 с. Не перегревайте — дымность станет резкой."
+  },
+
+  /* ── Светлый улун (из PDF «oolong_light») ── */
+  {
+    id: "oolong_light-te-guan-in-guo-syan",
+    name_ru: "Те Гуань Инь Гуо Сян",
+    name_cn: "果香铁观音 (Guǒxiāng Tiěguānyīn)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [7, 5, 7, 15, 30, 50, 100, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["спелые фрукты", "цветочный мёд", "сливочность", "орхидея"],
+    brewing_tip: "Те Гуань Инь «Гуо Сян» (фруктовый аромат): вода 85°C. Шарики раскрываются к 2–3 проливу — именно поэтому время сначала снижается, а потом быстро растёт."
+  },
+  {
+    id: "oolong_light-te-guan-in-khua-syan",
+    name_ru: "Те Гуань Инь Хуа Сян",
+    name_cn: "花香铁观音 (Huāxiāng Tiěguānyīn)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [7, 5, 7, 15, 30, 50, 100, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["сирень", "орхидея", "свежескошенная трава", "сливочность"],
+    brewing_tip: "Те Гуань Инь «Хуа Сян» (цветочный аромат): вода 85°C. Понюхайте остывающую крышку после первых проливов — самый богатый букет там."
+  },
+  {
+    id: "oolong_light-te-guan-in-gao-shan",
+    name_ru: "Те Гуань Инь Гао Шань",
+    name_cn: "高山铁观音 (Gāoshān Tiěguānyīn)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [6, 5, 7, 15, 30, 50, 100, 120, 120, 120], max_steeps: 10, open_lid_warning: false,
+    flavor_tags: ["горная свежесть", "орхидея", "сливочность", "сладкая зелень"],
+    brewing_tip: "Высокогорный Те Гуань Инь: вода 85°C. Не торопитесь прибавлять время в начале — чай раскрывается к 3–4 проливу."
+  },
+  {
+    id: "oolong_light-te-guan-in-mao-cha",
+    name_ru: "Те Гуань Инь Мао ча",
+    name_cn: "铁观音毛茶 (Tiěguānyīn Máochá)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.9,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [7, 7, 10, 15, 30, 50, 100, 120], max_steeps: 8, open_lid_warning: false,
+    flavor_tags: ["свежий лист", "цветы", "сухая трава", "лёгкая терпкость"],
+    brewing_tip: "Мао ча — недообработанный чай, поэтому он заметно грубее готового улуна. Здесь больше чая на воду (1 на 17); 3-й пролив длиннее 2-го."
+  },
+  {
+    id: "oolong_light-dun-din",
+    name_ru: "Дун Дин",
+    name_cn: "冻顶乌龙 (Dòngdǐng Wūlóng)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 15, 30, 50, 100, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["лесной орех", "сливочный ирис", "тропические фрукты", "карамель"],
+    brewing_tip: "Дун Дин: вода 85°C. Шарики раскрываются к 2-му проливу; после 4-го пролива время растёт быстро."
+  },
+  {
+    id: "oolong_light-sy-tszy-chun-vesna-chetyrekh-sezonov",
+    name_ru: "Сы Цзы Чунь (Весна четырёх сезонов)",
+    name_cn: "四季春 (Sìjìchūn)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 15, 30, 50, 100, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["цветочный", "свежий лист", "сирень", "лёгкая сладость"],
+    brewing_tip: "Сы Цзы Чунь — лёгкий и свежий улун: вода 85°C. Следуйте таймеру, не перенастаивайте начало."
+  },
+  {
+    id: "oolong_light-tszin-syuan-zolotoy-tsvetok",
+    name_ru: "Цзинь Сюань (Золотой цветок)",
+    name_cn: "金萱 (Jīnxuān)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 15, 30, 50, 100, 120, 120], max_steeps: 9, open_lid_warning: false,
+    flavor_tags: ["натуральные сливки", "цветы османтуса", "сладкая кукуруза", "ваниль"],
+    brewing_tip: "Культивар Цзинь Сюань даёт природную молочно-сливочную сладость. Вода 85°C; первые проливы короткие."
+  },
+  {
+    id: "oolong_light-zhen-shen",
+    name_ru: "Жень Шень",
+    name_cn: "人参乌龙 (Rénshēn Wūlóng)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [5, 5, 5, 15, 25, 50, 100, 120, 120, 120, 120], max_steeps: 11, open_lid_warning: false,
+    flavor_tags: ["корень женьшеня", "сладкая лакрица", "древесность", "мёд"],
+    brewing_tip: "Улун с женьшенем: вода 85°C. Первые три пролива по 5 с, затем время растёт; не добавляйте секунд — вкус и так плотный."
+  },
+  {
+    id: "oolong_light-tan-kao-te-guan-in-guo-syan-propechennyy-fruktovyy",
+    name_ru: "Тань Као Те Гуань Инь Гуо Сян (Пропечённый фруктовый)",
+    name_cn: "",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [8, 8, 10, 15, 30, 50, 100, 120, 120, 120, 120], max_steeps: 11, open_lid_warning: false,
+    flavor_tags: ["печёное яблоко", "карамель", "орехи", "фруктовая сладость"],
+    brewing_tip: "Пропечённый Те Гуань Инь: вода 85–90°C. После прожарки чай любит горячую воду и отлично подходит для вечера."
+  },
+  {
+    id: "oolong_light-tan-kao-te-guan-in-khua-syan-propechennyy-tsvetochnyy",
+    name_ru: "Тань Као Те Гуань Инь Хуа Сян (Пропечённый цветочный)",
+    name_cn: "",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [8, 8, 10, 15, 30, 50, 100, 120, 120, 120, 120], max_steeps: 11, open_lid_warning: false,
+    flavor_tags: ["печёный цветок", "карамель", "тёплая выпечка", "орехи"],
+    brewing_tip: "Пропечённый цветочный Те Гуань Инь: вода 85–90°C. Первые проливы по 8 с, затем время растёт."
+  },
+  {
+    id: "oolong_light-mi-syan-ulun",
+    name_ru: "Ми Сян Улун",
+    name_cn: "蜜香乌龙 (Mìxiāng Wūlóng)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 15, 30, 50, 100, 120, 120, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["мёд", "зрелые фрукты", "цветочный нектар", "карамель"],
+    brewing_tip: "Медовый улун: вода 85°C, первые проливы 6, 6 и 8 с. Хорошо держит поздние проливы."
+  },
+  {
+    id: "oolong_light-dun-fan-mey-zhen-vostochnaya-krasavitsa",
+    name_ru: "Дун Фан Мэй Жень (Восточная красавица)",
+    name_cn: "东方美人 (Dōngfāng Měirén)",
+    categoryId: "oolong_light", categoryName: "Светлый улун",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [6, 5, 8, 15, 30, 50, 100, 120, 120, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["мёд", "спелый персик", "фруктовая сладость", "мускатные ноты"],
+    brewing_tip: "Дун Фан Мэй Жень сильно ферментирован: вода 85°C. Не перегревайте — настой должен остаться сладким и фруктовым."
+  },
+
+  /* ── Тёмный улун (из PDF «oolong_dark») ── */
+  {
+    id: "oolong_dark-da-khun-pao-slabogo-ognya",
+    name_ru: "Да хун Пао Слабого огня",
+    name_cn: "大红袍 (Dà Hóng Páo)",
+    categoryId: "oolong_dark", categoryName: "Тёмный улун",
+    temp_c: 87, temp_max: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 10, 20, 30, 40, 60, 80, 100, 100, 100, 100], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["корочка ржаного хлеба", "минералы", "тёмный шоколад", "лёгкий дым"],
+    brewing_tip: "Да Хун Пао слабого огня: вода 87–90°C. Первые проливы короткие, чтобы поймать «утёсную мелодию» (Янь Юнь) без горечи."
+  },
+  {
+    id: "oolong_dark-ya-shi-syan-dan-tsun",
+    name_ru: "Я Ши Сян Дань Цун",
+    name_cn: "鸭屎香单丛 (Yāshǐxiāng Dāncóng)",
+    categoryId: "oolong_dark", categoryName: "Тёмный улун",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [4, 4, 5, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["личи", "грейпфрут", "медовая орхидея", "цветочный"],
+    brewing_tip: "Дань Цун — капризный чай: вода 85–90°C, первые проливы по 4 с. Чуть передержите — появится терпкость."
+  },
+  {
+    id: "oolong_dark-mi-lan-syan-dan-tsun",
+    name_ru: "Ми Лань Сян Дань Цун",
+    name_cn: "蜜兰香单丛 (Mìlánxiāng Dāncóng)",
+    categoryId: "oolong_dark", categoryName: "Тёмный улун",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["медовая орхидея", "абрикос", "цветочная сладость", "сливочность"],
+    brewing_tip: "Дань Цун: вода 85–90°C, первые проливы по 3 с. Сладость держится до поздних проливов; не прибавляйте время сверх таймера."
+  },
+  {
+    id: "oolong_dark-tao-khua-syan-dan-tsun",
+    name_ru: "Тао Хуа Сян Дань Цун",
+    name_cn: "",
+    categoryId: "oolong_dark", categoryName: "Тёмный улун",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [3, 3, 5, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["персиковый цвет", "мёд", "цветочная сладость", "свежая зелень"],
+    brewing_tip: "Дань Цун: вода 85–90°C. Начальные проливы по 3 с, дальше время плавно растёт."
+  },
+  {
+    id: "oolong_dark-fen-khuan-dan-tsun",
+    name_ru: "Фэн Хуан Дань Цун",
+    name_cn: "凤凰单丛 (Fènghuáng Dāncóng)",
+    categoryId: "oolong_dark", categoryName: "Тёмный улун",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
-    base_sec: 10, step_sec: 8, max_steeps: 7, open_lid_warning: false,
-    flavor_tags: ["сосновый дымок", "лонган (глаз дракона)", "чернослив", "смола"],
-    brewing_tip: "Согревающий зимний и вечерний чай. Более зрелый лист хорошо переносит температуру выше 90°C."
-  },
-  {
-    id: "qimen-hong-cha",
-    name_ru: "Ци Мэнь Хун Ча (Кимун)",
-    name_cn: "祁门红茶 (Qímén Hóngchá)",
-    categoryId: "red_tea", categoryName: "Красный чай",
-    curve_type: "loose", temp_c: 90, grams_per_100ml: 5.0,
-    needs_rinse: true, rinse_sec: 3, warm_breath_sec: 25,
-    base_sec: 8, step_sec: 7, max_steeps: 6, open_lid_warning: false,
-    flavor_tags: ["красное вино", "чайная роза", "сухофрукты", "легкая пряность"],
-    brewing_tip: "Лист у Кимуна часто мелкой фракции, поэтому первые проливы сливайте вовремя, не допуская перезаваривания."
-  },
-  {
-    id: "hong-yu-18",
-    name_ru: "Хун Юй №18 (Рубиновый тайваньский)",
-    name_cn: "红玉十八号 (Hóngyù Shíbā Hào)",
-    categoryId: "red_tea", categoryName: "Красный чай",
-    curve_type: "loose", temp_c: 92, grams_per_100ml: 5.0,
-    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
-    base_sec: 12, step_sec: 10, max_steeps: 8, open_lid_warning: false,
-    flavor_tags: ["ментол", "эвкалипт", "корица", "спелая вишня"],
-    brewing_tip: "Уникальный гибрид дикого тайваньского чая и бирманской камелии. Оставляет отчетливый мятный холодок на вдохе."
+    steep_times: [5, 3, 7, 10, 15, 20, 30, 50, 80, 80, 80, 80, 80, 80, 80], max_steeps: 15, open_lid_warning: false,
+    flavor_tags: ["личи", "грейпфрут", "медовая орхидея", "имбирь"],
+    brewing_tip: "Фэн Хуан Дань Цун: вода 85–90°C. Заваривайте почти «залил — слил» в первых проливах — чуть передержите, и появится сильная терпкость."
   },
 
-  /* ── Категория 5: Белый чай ── */
+  /* ── Хэй Ча (из PDF «hei_cha») ── */
   {
-    id: "bai-hao-yin-zhen",
-    name_ru: "Бай Хао Инь Чжэнь (Серебряные иглы)",
-    name_cn: "白毫银针 (Báiháo Yínzhēn)",
-    categoryId: "white_tea", categoryName: "Белый чай",
-    curve_type: "loose", temp_c: 82, grams_per_100ml: 5.0,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 20, step_sec: 12, max_steeps: 7, open_lid_warning: true,
-    flavor_tags: ["березовый сок", "дыня", "цветущая липа", "родниковая вода"],
-    brewing_tip: "Промывать не нужно! Серебристый ворс отталкивает воду на старте, поэтому 1-й пролив делаем долгим (20 с). Крышку гайвани держите открытой."
+    id: "hei_cha-khey-cha-khuan-tszin-khua-2015-g",
+    name_ru: "Хэй Ча Хуан Цзинь Хуа (2015 г.)",
+    name_cn: "黄金花黑茶 (Huángjīnhuā Hēichá)",
+    categoryId: "hei_cha", categoryName: "Хэй Ча",
+    temp_c: 95, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 7, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120, 120, 120], max_steeps: 15, open_lid_warning: false,
+    flavor_tags: ["белые грибы", "сдоба", "погребок", "мягкая сладость"],
+    brewing_tip: "Хэй ча с «золотыми цветами» заваривают кипятком (95°C). Промывка 10 с; чай мягкий и не боится передержки."
   },
   {
-    id: "bai-mu-dan",
-    name_ru: "Бай Му Дань (Белый пион)",
-    name_cn: "白牡丹 (Bái Mǔdān)",
-    categoryId: "white_tea", categoryName: "Белый чай",
-    curve_type: "loose", temp_c: 85, grams_per_100ml: 5.0,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 15, step_sec: 10, max_steeps: 7, open_lid_warning: true,
-    flavor_tags: ["луговое разнотравье", "груша", "абрикосовая косточка", "мед"],
-    brewing_tip: "Почка и два листика. Насыпайте заварку рыхло (не утрамбовывая), так как лист очень объемный."
+    id: "hei_cha-lyu-bao-2001-g",
+    name_ru: "Лю Бао (2001 г.)",
+    name_cn: "六堡茶 (Liùbǎo Chá)",
+    categoryId: "hei_cha", categoryName: "Хэй Ча",
+    temp_c: 100, grams_per_100ml: 5.9,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмное дерево", "сухофрукты", "погребок", "мягкая медовость"],
+    brewing_tip: "Лю Бао заваривают кипятком (100°C), на 1 г чая — 17 мл воды. Промывка 7–10 с; чай мягкий и держит много проливов."
   },
   {
-    id: "shou-mei",
-    name_ru: "Шоу Мэй (Брови долголетия — рассыпной)",
-    name_cn: "寿眉 (Shòu Méi)",
-    categoryId: "white_tea", categoryName: "Белый чай",
-    curve_type: "loose", temp_c: 90, grams_per_100ml: 5.0,
-    needs_rinse: true, rinse_sec: 4, warm_breath_sec: 20,
-    base_sec: 12, step_sec: 10, max_steeps: 7, open_lid_warning: false,
-    flavor_tags: ["осенняя листва", "шарлотка с яблоками", "шиповник"],
-    brewing_tip: "Зрелый крупный лист. В отличие от почек, любит воду погорячее (90°C) и дает плотный янтарный настой."
+    id: "hei_cha-binlan-syan-lyu-bao-2017-g",
+    name_ru: "Бинлань Сянь Лю Бао (2017 г.)",
+    name_cn: "",
+    categoryId: "hei_cha", categoryName: "Хэй Ча",
+    temp_c: 100, grams_per_100ml: 5.9,
+    needs_rinse: true, rinse_sec: 9, warm_breath_sec: 30,
+    steep_times: [7, 7, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["аромат бетеля", "сухофрукты", "тёмное дерево", "мёд"],
+    brewing_tip: "Лю Бао с ароматом бетеля: вода 100°C, на 1 г чая — 17 мл. Не перегружайте посуду — чай даёт много проливов."
   },
   {
-    id: "lao-bai-cha",
-    name_ru: "Лао Бай Ча (Выдержанный белый чай в блине)",
-    name_cn: "老白茶 (Lǎo Bái Chá)",
-    categoryId: "white_tea", categoryName: "Белый чай",
-    curve_type: "pressed", temp_c: 96, grams_per_100ml: 6.0,
-    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 35,
-    base_sec: 15, step_sec: 10, max_steeps: 10, open_lid_warning: false,
-    flavor_tags: ["узвар из сухофруктов", "финики", "пряные травы", "старый мед"],
-    brewing_tip: "«Один год — чай, три года — лекарство, семь лет — сокровище». Заваривайте почти кипятком, как выдержанный пуэр."
-  },
-
-  /* ── Категория 6: Зеленый чай ── */
-  {
-    id: "xihu-longjing",
-    name_ru: "Сиху Лунцзин (Колодец Дракона)",
-    name_cn: "西湖龙井 (Xīhú Lóngjǐng)",
-    categoryId: "green_tea", categoryName: "Зеленый чай",
-    curve_type: "loose", temp_c: 80, grams_per_100ml: 4.5,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 10, step_sec: 5, max_steeps: 5, open_lid_warning: true,
-    flavor_tags: ["жареные тыквенные семечки", "каштан", "молодая зелень", "умами"],
-    brewing_tip: "Без промывки! Сухой лист сначала прогрейте дыханием в теплой гайвани, чтобы услышать ореховый аромат. Крышку не закрывать!"
+    id: "hei_cha-lyu-bao-gao-shan-2023-g",
+    name_ru: "Лю Бао Гао Шань (2023 г.)",
+    name_cn: "高山六堡茶 (Gāoshān Liùbǎochá)",
+    categoryId: "hei_cha", categoryName: "Хэй Ча",
+    temp_c: 100, grams_per_100ml: 5.9,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [8, 6, 10, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмное дерево", "сухофрукты", "погребок", "мягкая медовость"],
+    brewing_tip: "Лю Бао заваривают кипятком (100°C), на 1 г чая — 17 мл воды. Промывка 7–10 с; чай мягкий и держит много проливов."
   },
   {
-    id: "dongting-bi-luo-chun",
-    name_ru: "Дунтин Би Ло Чунь (Изумрудные спирали весны)",
-    name_cn: "洞庭碧螺春 (Dòngtíng Bìluóchūn)",
-    categoryId: "green_tea", categoryName: "Зеленый чай",
-    curve_type: "loose", temp_c: 78, grams_per_100ml: 4.0,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 8, step_sec: 5, max_steeps: 5, open_lid_warning: true,
-    flavor_tags: ["весенние почки", "персиковый цвет", "свежий горошек", "сладость"],
-    brewing_tip: "Нежнейший ворсистый чай. Налейте сначала воду в гайвань, а сверху бросьте чай (метод Верхней Заброски), либо лейте строго по стенке."
-  },
-  {
-    id: "anji-bai-cha",
-    name_ru: "Аньцзи Бай Ча (Белый чай из Аньцзи)",
-    name_cn: "安吉白茶 (Ānjí Bái Chá)",
-    categoryId: "green_tea", categoryName: "Зеленый чай",
-    curve_type: "loose", temp_c: 80, grams_per_100ml: 4.0,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 12, step_sec: 6, max_steeps: 5, open_lid_warning: true,
-    flavor_tags: ["бульон умами", "спаржа", "морской бриз", "цитрусовая свежесть"],
-    brewing_tip: "Ботанически это зеленый чай с рекордным содержанием L-теанина. Практически никогда не горчит."
-  },
-  {
-    id: "taiping-hou-kui",
-    name_ru: "Тайпин Хоукуй (Главарь обезьян из Тайпин)",
-    name_cn: "太平猴魁 (Tàipíng Hóukuí)",
-    categoryId: "green_tea", categoryName: "Зеленый чай",
-    curve_type: "loose", temp_c: 82, grams_per_100ml: 4.5,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 12, step_sec: 7, max_steeps: 6, open_lid_warning: true,
-    flavor_tags: ["дикая орхидея", "лесная свежесть", "сладкий миндаль"],
-    brewing_tip: "Огромные плоские листья длиной до 10 см. Лучше всего заваривать в высоком стеклянном стакане или широкой гайвани."
-  },
-  {
-    id: "luan-gua-pian",
-    name_ru: "Лю Ань Гуа Пянь (Тыквенные семечки из Люань)",
-    name_cn: "六安瓜片 (Lù'ān Guāpiàn)",
-    categoryId: "green_tea", categoryName: "Зеленый чай",
-    curve_type: "loose", temp_c: 82, grams_per_100ml: 4.5,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 10, step_sec: 6, max_steeps: 6, open_lid_warning: true,
-    flavor_tags: ["сладкая кукуруза", "зелень", "легкий прогрев на углях"],
-    brewing_tip: "Единственный зеленый чай, который делают исключительно из зрелого листа без почек и черенков."
-  },
-  {
-    id: "moli-hua-cha",
-    name_ru: "Моли Хуа Ча (Жасминовый зеленый чай / Глаз Феникса)",
-    name_cn: "茉莉花茶 (Mòlì Huā Chá)",
-    categoryId: "green_tea", categoryName: "Зеленый чай",
-    curve_type: "loose", temp_c: 80, grams_per_100ml: 4.5,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 10, step_sec: 6, max_steeps: 6, open_lid_warning: true,
-    flavor_tags: ["ночной жасмин", "весенний мед", "виноград"],
-    brewing_tip: "Если заварить кипятком — зеленая основа даст горечь, которая убьет тонкий цветочный эфир жасмина. Держите 80°C!"
+    id: "hei_cha-nutsun-lyu-bao-2015-g",
+    name_ru: "Нуцун Лю Бао (2015 г.)",
+    name_cn: "",
+    categoryId: "hei_cha", categoryName: "Хэй Ча",
+    temp_c: 100, grams_per_100ml: 5.9,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [7, 6, 10, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмное дерево", "сухофрукты", "погребок", "мягкая медовость"],
+    brewing_tip: "Лю Бао заваривают кипятком (100°C), на 1 г чая — 17 мл воды. Промывка 7–10 с; чай мягкий и держит много проливов."
   },
 
-  /* ── Категория 7: Желтый чай ── */
+  /* ── Шэн Пуэр (из PDF «sheng_puer») ── */
   {
-    id: "jun-shan-yin-zhen",
-    name_ru: "Цзюнь Шань Инь Чжэнь (Серебряные иглы с гор Цзюньшань)",
-    name_cn: "君山银针 (Jūnshān Yínzhēn)",
-    categoryId: "yellow_tea", categoryName: "Желтый чай",
-    curve_type: "loose", temp_c: 85, grams_per_100ml: 4.5,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 15, step_sec: 10, max_steeps: 6, open_lid_warning: true,
-    flavor_tags: ["печеный каштан", "кукурузные рыльца", "легкий дымок", "тростниковый сахар"],
-    brewing_tip: "Прошел процедуру томления в пергаменте (Мэнь Хуан). В стеклянном стакане почки красиво встают вертикально («танец чаинок»)."
+    id: "sheng_puer-purpurnyy-tszy-tszyuan-2022-g",
+    name_ru: "Пурпурный Цзы Цзюань (2022 г.)",
+    name_cn: "紫鹃 (Zǐjuān)",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90], max_steeps: 11, open_lid_warning: true,
+    flavor_tags: ["курага", "луговые травы", "яблочная кислинка", "дымок"],
+    brewing_tip: "Молодой шэн пуэр: вода 80–85°C, первые проливы по 5 с. Не закрывайте крышку между проливами — иначе чай запарится и станет терпким."
   },
   {
-    id: "meng-ding-huang-ya",
-    name_ru: "Мэн Дин Хуан Я (Желтые почки с пика Мэндин)",
-    name_cn: "蒙顶黄芽 (Méngdǐng Huángyá)",
-    categoryId: "yellow_tea", categoryName: "Желтый чай",
-    curve_type: "loose", temp_c: 85, grams_per_100ml: 4.5,
-    needs_rinse: false, rinse_sec: 0, warm_breath_sec: 0,
-    base_sec: 12, step_sec: 8, max_steeps: 6, open_lid_warning: true,
-    flavor_tags: ["топленое масло", "сладкие орехи", "карамель", "свежесть"],
-    brewing_tip: "Обладает свежестью зеленого чая, но полностью лишен травянистой резкости и агрессивности для желудка."
+    id: "sheng_puer-purpurnyy-tszya-ya-shen-2023-g",
+    name_ru: "Пурпурный Цзя Я Шэн (2023 г.)",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90], max_steeps: 11, open_lid_warning: true,
+    flavor_tags: ["курага", "луговые травы", "яблочная кислинка", "дымок"],
+    brewing_tip: "Молодой шэн пуэр: вода 80–85°C, первые проливы по 5 с. Не закрывайте крышку между проливами — иначе чай запарится и станет терпким."
+  },
+  {
+    id: "sheng_puer-shen-puer-bengvey-2022-g",
+    name_ru: "Шен Пуэр Бэнгвей (2022 г.)",
+    name_cn: "邦崴生普洱 (Bāngwēi Shēng Pǔ'ěr)",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90], max_steeps: 11, open_lid_warning: true,
+    flavor_tags: ["курага", "луговые травы", "яблочная кислинка", "дымок"],
+    brewing_tip: "Молодой шэн пуэр: вода 80–85°C, первые проливы по 5 с. Не закрывайте крышку между проливами — иначе чай запарится и станет терпким."
+  },
+  {
+    id: "sheng_puer-rassypnoy-gu-shu-2024-g",
+    name_ru: "Рассыпной Гу Шу (2024 г.)",
+    name_cn: "古树生普 (Gǔshù Shēngpǔ)",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90, 90], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["горный мёд", "цветочный", "лёгкая горчинка", "долгое послевкусие"],
+    brewing_tip: "Рассыпной гу шу: вода 80–85°C, промывка 5 с. Следуйте таймеру: чай быстро становится терпким при передержке."
+  },
+  {
+    id: "sheng_puer-ban-e-2018-g",
+    name_ru: "Бань Е (2018 г.)",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["курага", "сладкие травы", "горная свежесть", "мёд"],
+    brewing_tip: "Шэн пуэр средней выдержки: вода 80–85°C. Первые проливы по 5–6 с; сладость нарастает к 4–5 проливу."
+  },
+  {
+    id: "sheng_puer-pa-sha-2021-g",
+    name_ru: "Па Ша (2021 г.)",
+    name_cn: "帕沙 (Pàshā)",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 4.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [5, 5, 6, 16, 30, 50, 70, 90, 90, 90, 90, 90], max_steeps: 12, open_lid_warning: true,
+    flavor_tags: ["курага", "луговые травы", "яблочная кислинка", "дымок"],
+    brewing_tip: "Молодой шэн пуэр: вода 80–85°C, первые проливы по 5 с. Не закрывайте крышку между проливами — иначе чай запарится и станет терпким."
+  },
+  {
+    id: "sheng_puer-pavlin-ot-cha-shu-van-2016-g",
+    name_ru: "Павлин от Ча Шу Ван (2016 г.)",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [6, 6, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["курага", "сладкие травы", "горная свежесть", "мёд"],
+    brewing_tip: "Шэн пуэр средней выдержки: вода 80–85°C. Первые проливы по 5–6 с; сладость нарастает к 4–5 проливу."
+  },
+  {
+    id: "sheng_puer-lao-ban-chzhan-2018-g",
+    name_ru: "Лао Бань Чжань (2018 г.)",
+    name_cn: "老班章 (Lǎo Bānzhāng)",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [5, 5, 8, 16, 30, 50, 70, 90, 90, 90, 90, 90], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["курага", "сладкие травы", "горная свежесть", "мёд"],
+    brewing_tip: "Шэн пуэр средней выдержки: вода 80–85°C. Первые проливы по 5–6 с; сладость нарастает к 4–5 проливу."
+  },
+  {
+    id: "sheng_puer-lao-ban-chzhan-2014-g",
+    name_ru: "Лао Бань Чжань (2014 г.)",
+    name_cn: "老班章 (Lǎo Bānzhāng)",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 20, 40, 60, 80, 100, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["камфора", "сухофрукты", "старое дерево", "медовая сладость"],
+    brewing_tip: "Выдержанный шэн любит горячую воду: в таблице 85°C, промывка 10 с, затем время растёт ровно. Обратите внимание на долгое сладкое послевкусие (Хуэй Гань)."
+  },
+  {
+    id: "sheng_puer-korolevskiy-2012-g",
+    name_ru: "Королевский (2012 г.)",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 20, 40, 60, 80, 100, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["камфора", "сухофрукты", "старое дерево", "медовая сладость"],
+    brewing_tip: "Выдержанный шэн любит горячую воду: в таблице 85°C, промывка 10 с, затем время растёт ровно. Обратите внимание на долгое сладкое послевкусие (Хуэй Гань)."
+  },
+  {
+    id: "sheng_puer-nan-shauntszyan-2007-g",
+    name_ru: "Нань Шаунцзянь (2007 г.)",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 20, 40, 60, 80, 100, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["камфора", "сухофрукты", "старое дерево", "медовая сладость"],
+    brewing_tip: "Выдержанный шэн любит горячую воду: в таблице 85°C, промывка 10 с, затем время растёт ровно. Обратите внимание на долгое сладкое послевкусие (Хуэй Гань)."
+  },
+  {
+    id: "sheng_puer-chzhan-yan-1996-g",
+    name_ru: "Чжань Янь (1996 г.)",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 85, temp_max: 90, grams_per_100ml: 5.9,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 20, 40, 60, 80, 100, 120, 120, 120, 120, 120], max_steeps: 14, open_lid_warning: false,
+    flavor_tags: ["камфора", "сухофрукты", "старое дерево", "медовая сладость"],
+    brewing_tip: "Выдержанный шэн любит горячую воду: в таблице 85°C, промывка 10 с, затем время растёт ровно. Обратите внимание на долгое сладкое послевкусие (Хуэй Гань)."
+  },
+  {
+    id: "sheng_puer-shen-s-tsvetkom",
+    name_ru: "Шен с цветком",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 80, temp_max: 85, grams_per_100ml: 4.0,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [5, 5, 6, 16, 30, 50, 70, 90, 90, 90, 90, 90], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["цветочный", "мёд", "лёгкая терпкость", "свежесть"],
+    brewing_tip: "Шэн пуэр с цветком: 1 г на 25 мл — настой получается лёгким. Вода 80–85°C, первые проливы короткие."
+  },
+  {
+    id: "sheng_puer-shen-puer-zhemchuzhina",
+    name_ru: "Шен Пуэр Жемчужина",
+    name_cn: "",
+    categoryId: "sheng_puer", categoryName: "Шэн Пуэр",
+    temp_c: 85, grams_per_100ml: 5.0,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 9, 15, 20, 40, 60, 80, 100, 120, 120, 120], max_steeps: 12, open_lid_warning: false,
+    flavor_tags: ["курага", "мёд", "горные травы", "лёгкая терпкость"],
+    brewing_tip: "Шэн пуэр-«жемчужина»: вода 85°C. Прогрейте шарик на промывке дольше — он раскрывается медленно."
+  },
+
+  /* ── Шу Пуэр (из PDF «shu_puer») ── */
+  {
+    id: "shu_puer-rassypnoy-shu-puer-menkhay-gu-shu-2016-g",
+    name_ru: "Рассыпной Шу Пуэр Мэнхай Гу Шу (2016 г.)",
+    name_cn: "勐海古树熟普 (Měnghǎi Gǔshù Shúpǔ)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 7, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120, 120, 120], max_steeps: 15, open_lid_warning: false,
+    flavor_tags: ["горький шоколад", "чернослив", "торф", "сливочность"],
+    brewing_tip: "Рассыпной шу пуэр заваривают кипятком (100°C), на 1 г чая — 15 мл воды. Промывка 10 с, первые проливы по 7–10 с, затем время плавно растёт."
+  },
+  {
+    id: "shu_puer-rassypnoy-shu-puer-guntin-tszin-ya-2019-g",
+    name_ru: "Рассыпной Шу пуэр Гунтин Цзинь Я (2019 г.)",
+    name_cn: "宫廷金芽 (Gōngtíng Jīnyá)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 7, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["сладкий шоколад", "сливочность", "мёд", "чернослив"],
+    brewing_tip: "Дворцовый шу из мелких почек: промывка 10 с и три пролива по 7 с — не передержите, иначе настой станет густым, как «нефть»."
+  },
+  {
+    id: "shu_puer-lao-ban-chzhan-2017-g",
+    name_ru: "Лао Бань Чжань (2017 г.)",
+    name_cn: "老班章 (Lǎo Bānzhāng)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["древесный", "ореховый", "влажная кора", "тёмный шоколад"],
+    brewing_tip: "Прессованный шу пуэр: после промывки дайте листу подышать. Первые проливы по 10 с, затем время растёт; кипяток 100°C."
+  },
+  {
+    id: "shu_puer-shen-yun-2019-g",
+    name_ru: "Шэнь Юнь (2019 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["древесный", "ореховый", "влажная кора", "тёмный шоколад"],
+    brewing_tip: "Прессованный шу пуэр: после промывки дайте листу подышать. Первые проливы по 10 с, затем время растёт; кипяток 100°C."
+  },
+  {
+    id: "shu_puer-chen-syan-2006-g",
+    name_ru: "Чэнь Сян (2006 г.)",
+    name_cn: "陈香 (Chénxiāng)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120], max_steeps: 11, open_lid_warning: false,
+    flavor_tags: ["финики", "карамель", "старое дерево", "сухофрукты"],
+    brewing_tip: "Выдержанный шу пуэр — мягкий и сладкий. Кипяток 100°C, промывка 10–15 с, много проливов; чем старше чай, тем нежнее начальные ноты."
+  },
+  {
+    id: "shu_puer-bingdao-2018-g",
+    name_ru: "Бингдао (2018 г.)",
+    name_cn: "冰岛 (Bīngdǎo)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["древесный", "ореховый", "влажная кора", "тёмный шоколад"],
+    brewing_tip: "Прессованный шу пуэр: после промывки дайте листу подышать. Первые проливы по 10 с, затем время растёт; кипяток 100°C."
+  },
+  {
+    id: "shu_puer-pan-chzhan-1997-g",
+    name_ru: "Пан Чжань (1997 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["финики", "карамель", "старое дерево", "сухофрукты"],
+    brewing_tip: "Выдержанный шу пуэр — мягкий и сладкий. Кипяток 100°C, промывка 10–15 с, много проливов; чем старше чай, тем нежнее начальные ноты."
+  },
+  {
+    id: "shu_puer-banchzhan-tszinya-2011-g",
+    name_ru: "Банчжан Цзинья (2011 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["финики", "карамель", "старое дерево", "сухофрукты"],
+    brewing_tip: "Выдержанный шу пуэр — мягкий и сладкий. Кипяток 100°C, промывка 10–15 с, много проливов; чем старше чай, тем нежнее начальные ноты."
+  },
+  {
+    id: "shu_puer-dvortsovyy-zolotoy-buton-2014-g",
+    name_ru: "Дворцовый Золотой Бутон (2014 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 7, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["сладкий шоколад", "сливочность", "мёд", "чернослив"],
+    brewing_tip: "Дворцовый шу из мелких почек: промывка 10 с и три пролива по 7 с — не передержите, иначе настой станет густым, как «нефть»."
+  },
+  {
+    id: "shu_puer-yun-chzhen-guntin-250gr-2024-g",
+    name_ru: "Юн Чжень Гунтин 250гр (2024 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [7, 7, 7, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["сладкий шоколад", "сливочность", "мёд", "чернослив"],
+    brewing_tip: "Дворцовый шу из мелких почек: промывка 10 с и три пролива по 7 с — не передержите, иначе настой станет густым, как «нефть»."
+  },
+  {
+    id: "shu_puer-starinnyy-100gr-1992-g",
+    name_ru: "Старинный 100гр (1992 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["финики", "карамель", "старое дерево", "сухофрукты"],
+    brewing_tip: "Выдержанный шу пуэр — мягкий и сладкий. Кипяток 100°C, промывка 10–15 с, много проливов; чем старше чай, тем нежнее начальные ноты."
+  },
+  {
+    id: "shu_puer-da-i-geysha",
+    name_ru: "Да И (Гейша)",
+    name_cn: "大益 (Dàyì)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмный шоколад", "сладкая древесина", "ореховый", "чернослив"],
+    brewing_tip: "Да И: кипяток 100°C, на 1 г чая — 15 мл. Первые проливы 7–10 с, затем время плавно растёт."
+  },
+  {
+    id: "shu_puer-da-i-dva-brata",
+    name_ru: "Да И (Два Брата)",
+    name_cn: "大益 (Dàyì)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмный шоколад", "сладкая древесина", "ореховый", "чернослив"],
+    brewing_tip: "Да И: кипяток 100°C, на 1 г чая — 15 мл. Первые проливы 7–10 с, затем время плавно растёт."
+  },
+  {
+    id: "shu_puer-da-i-mi-syan",
+    name_ru: "Да И (Ми Сян)",
+    name_cn: "大益 (Dàyì)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [10, 7, 9, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмный шоколад", "сладкая древесина", "ореховый", "чернослив"],
+    brewing_tip: "Да И: кипяток 100°C, на 1 г чая — 15 мл. Первые проливы 7–10 с, затем время плавно растёт."
+  },
+  {
+    id: "shu_puer-da-i-v93",
+    name_ru: "Да И (V93)",
+    name_cn: "大益 (Dàyì)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 8, warm_breath_sec: 30,
+    steep_times: [9, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["тёмный шоколад", "сладкая древесина", "ореховый", "чернослив"],
+    brewing_tip: "Да И: кипяток 100°C, на 1 г чая — 15 мл. Первые проливы 7–10 с, затем время плавно растёт."
+  },
+  {
+    id: "shu_puer-golden-bud-100gr-2009-g",
+    name_ru: "Golden Bud 100гр (2009 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["финики", "карамель", "старое дерево", "сухофрукты"],
+    brewing_tip: "Выдержанный шу пуэр — мягкий и сладкий. Кипяток 100°C, промывка 10–15 с, много проливов; чем старше чай, тем нежнее начальные ноты."
+  },
+  {
+    id: "shu_puer-mu-e-chun",
+    name_ru: "Му Е Чунь",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [8, 8, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120, 120, 120], max_steeps: 15, open_lid_warning: false,
+    flavor_tags: ["горький шоколад", "чернослив", "торф", "сливочность"],
+    brewing_tip: "Рассыпной шу пуэр заваривают кипятком (100°C), на 1 г чая — 15 мл воды. Промывка 10 с, первые проливы по 7–10 с, затем время плавно растёт."
+  },
+  {
+    id: "shu_puer-cha-tou-2024-g-golovy-shu-puera",
+    name_ru: "Ча Тоу (2024 г. · Головы Шу Пуэра)",
+    name_cn: "茶头 (Chátóu)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 10.0,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [20, 20, 20, 30, 50, 70, 90, 90, 90, 90, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120], max_steeps: 20, open_lid_warning: false,
+    flavor_tags: ["грецкий орех", "карамель", "осенний лес", "финики"],
+    brewing_tip: "Ча Тоу — слежавшиеся «головки» шу пуэра. Магазин рекомендует для них метод варки, а проливы — если нравится слабый шу. Нужен кипяток 100°C и 1 г на 10–12 мл; чай очень живучий (до 20 проливов)."
+  },
+  {
+    id: "shu_puer-cha-tou-khua-shi-2025-g",
+    name_ru: "Ча Тоу Хуа Ши (2025 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 8.3,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [15, 15, 15, 25, 30, 35, 40, 50, 70, 90, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120], max_steeps: 20, open_lid_warning: false,
+    flavor_tags: ["грецкий орех", "карамель", "осенний лес", "финики"],
+    brewing_tip: "Ча Тоу — слежавшиеся «головки» шу пуэра. Магазин рекомендует для них метод варки, а проливы — если нравится слабый шу. Нужен кипяток 100°C и 1 г на 10–12 мл; чай очень живучий (до 20 проливов)."
+  },
+  {
+    id: "shu_puer-korolevskiy-ban-chzhan-2020-g",
+    name_ru: "Королевский Бань Чжань (2020 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["древесный", "ореховый", "влажная кора", "тёмный шоколад"],
+    brewing_tip: "Прессованный шу пуэр: после промывки дайте листу подышать. Первые проливы по 10 с, затем время растёт; кипяток 100°C."
+  },
+  {
+    id: "shu_puer-mini-to-cha-ban-chzhan-2019-g",
+    name_ru: "Мини То Ча Бань Чжань (2019 г.)",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120], max_steeps: 11, open_lid_warning: false,
+    flavor_tags: ["древесный", "земляной", "сладкий шоколад", "сухофрукты"],
+    brewing_tip: "Мини-то ча: разберите плитку на несколько кусочков. Кипяток 100°C; промывка 15 с."
+  },
+  {
+    id: "shu_puer-monetka-shu-s-tsedroy-apelsina",
+    name_ru: "Монетка Шу с цедрой апельсина",
+    name_cn: "",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["цедра апельсина", "шоколад", "древесность", "сладкая цитрусовая нота"],
+    brewing_tip: "Шу пуэр с цедрой апельсина: кипяток 100°C, промывка 7 с. Монетка быстро раскрывается — не передерживайте первые проливы."
+  },
+  {
+    id: "shu_puer-shu-puer-v-mandarine",
+    name_ru: "Шу Пуэр в мандарине",
+    name_cn: "柑普茶 (Gānpǔchá)",
+    categoryId: "shu_puer", categoryName: "Шу Пуэр",
+    temp_c: 100, grams_per_100ml: 6.7,
+    needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
+    steep_times: [10, 10, 12, 12, 20, 30, 40, 60, 80, 100, 120, 120, 120], max_steeps: 13, open_lid_warning: false,
+    flavor_tags: ["цедра мандарина", "эфирные масла", "древесность", "сладость"],
+    brewing_tip: "Проколите мандарин шилом или слегка надломите края, чтобы вода проходила сквозь пуэр. Кипяток 100°C, промывка 7 с."
   }
 ];
 
-console.assert(TEA_DATABASE.length === 36, `TEA_DATABASE должен содержать 36 сортов, сейчас: ${TEA_DATABASE.length}`);
-// Рабочий список (база + правки + свои сорта) собирается в rebuildTeas(); TEA_DATABASE остаётся неизменной базой из 36 сортов
+// Диапазон температур категории считается из базы, а не прописывается вручную
+for (const c of CATEGORIES) {
+  const ts = TEA_DATABASE.filter(t => t.categoryId === c.id);
+  const lo = Math.min(...ts.map(t => t.temp_c)), hi = Math.max(...ts.map(t => t.temp_max || t.temp_c));
+  c.temp = lo === hi ? `${lo}°C` : `${lo}–${hi}°C`;
+}
+
+console.assert(TEA_DATABASE.length === 106, `TEA_DATABASE должен содержать 106 сортов, сейчас: ${TEA_DATABASE.length}`);
+console.assert(TEA_DATABASE.every(t => t.steep_times.length === t.max_steeps), 'steep_times и max_steeps должны совпадать');
+// Рабочий список (база + правки + свои сорта) собирается в rebuildTeas(); TEA_DATABASE остаётся неизменной базой из PDF
 const TEA_BY_ID = {};
 let TEAS = [];
 
@@ -1223,15 +2022,6 @@ const ICON = {
 /* ════════════════════════════════════════════════════════════════════
    4. МАТЕМАТИЧЕСКОЕ ЯДРО
    ════════════════════════════════════════════════════════════════════ */
-const CURVES = {
-  pressed: { label: 'Прессовка', icon: ICON.pressed,
-    desc: 'Прессовка: на 2–3 проливе комок распадается, площадь контакта растёт — время уменьшается. С 4-го пролива — экспоненциальный рост.' },
-  rolled:  { label: 'Сфера', icon: ICON.rolled,
-    desc: 'Сферическая скрутка: 1-й пролив длиннее, чтобы пробить оболочку; на 2-м шарик раскрылся — сброс времени вниз; дальше плавный рост.' },
-  loose:   { label: 'Лист', icon: ICON.loose,
-    desc: 'Открытый лист: вода сразу омывает всю поверхность — линейная экстракция с лёгким ускорением к концу сессии.' }
-};
-
 const CLAY_BONUS = 0.5;
 const VOLUME_MIN = 50, VOLUME_MAX = 400;
 const VOLUME_PRESETS = [80, 100, 130, 160, 200];
@@ -1249,13 +2039,22 @@ function calcGrams(tea, volume, material) {
   return Math.round(((volume / 100) * tea.grams_per_100ml + bonus) * 10) / 10;
 }
 
-/** Нелинейные кривые экстракции → массив секунд длиной max_steeps */
+/** Температура для показа: «80» или диапазон «70–75» */
+const tempText = t => (t.temp_max && t.temp_max > t.temp_c) ? `${t.temp_c}–${t.temp_max}` : `${t.temp_c}`;
+
+/** Тайминги проливов берутся из готового массива steep_times (секунды), без формул */
 function generateSteepTimes(tea) {
-  const B = tea.base_sec, S = tea.step_sec, out = [];
-  for (let i = 1; i <= tea.max_steeps; i++) {
+  return tea.steep_times.slice();
+}
+
+/** Только для миграции: старые «свои» сорта хранили base_sec/step_sec/curve_type — переводим их в массив один раз */
+function legacySteepTimes(raw) {
+  const B = Number(raw.base_sec), S = Number(raw.step_sec) || 0, out = [];
+  const n = Math.min(30, Math.max(1, Math.round(Number(raw.max_steeps)) || 8));
+  for (let i = 1; i <= n; i++) {
     const prev = out[i - 2];
     let t;
-    switch (tea.curve_type) {
+    switch (raw.curve_type) {
       case 'pressed':
         if (i === 1)      t = B;
         else if (i === 2) t = Math.max(5, Math.round(B * 0.7));
@@ -1379,17 +2178,19 @@ const SEARCH_INDEX = {};
 const compactText = s => s.replace(/[\s'’\-()/·.,«»—]+/g, '');
 
 const TEA_DEFAULTS = {
-  curve_type: 'loose', temp_c: 90, grams_per_100ml: 5, needs_rinse: true, rinse_sec: 5, warm_breath_sec: 20,
-  base_sec: 10, step_sec: 6, max_steeps: 8, open_lid_warning: false, flavor_tags: [], brewing_tip: ''
+  temp_c: 90, grams_per_100ml: 5, needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
+  steep_times: [10, 12, 15, 20, 30, 45, 60, 90], max_steeps: 8, open_lid_warning: false, flavor_tags: [], brewing_tip: ''
 };
 const LIMITS = {
-  temp_c: [60, 100], grams_per_100ml: [1, 15], base_sec: [3, 300], step_sec: [0, 120],
-  max_steeps: [1, 20], rinse_sec: [1, 60], warm_breath_sec: [0, 120]
+  temp_c: [60, 100], temp_max: [60, 100], grams_per_100ml: [1, 15], rinse_sec: [1, 60], warm_breath_sec: [0, 120],
+  steep_sec: [1, 600], steep_count: [1, 30]
 };
 const FIELD_LABELS = {
-  temp_c: 'Температура', grams_per_100ml: 'Граммовка на 100 мл', base_sec: 'Время 1-го пролива',
-  step_sec: 'Шаг времени', max_steeps: 'Число проливов', rinse_sec: 'Время промывки', warm_breath_sec: 'Время прогрева'
+  temp_c: 'Температура', temp_max: 'Температура «до»', grams_per_100ml: 'Граммовка на 100 мл',
+  rinse_sec: 'Время промывки', warm_breath_sec: 'Время прогрева'
 };
+// Прежняя категория «Пуэры и Хэй Ча» разделилась; остальные идентификаторы сохранены
+const LEGACY_CATEGORY = { puerh_heicha: 'shu_puer' };
 
 function clampNum(v, [lo, hi], decimals = 0) {
   if (v === '' || v == null) return null;
@@ -1403,27 +2204,36 @@ function clampNum(v, [lo, hi], decimals = 0) {
 function cleanFields(raw) {
   const o = {};
   if (!raw || typeof raw !== 'object') return o;
-  for (const k of ['temp_c', 'base_sec', 'step_sec', 'max_steeps', 'rinse_sec', 'warm_breath_sec']) {
+  for (const k of ['temp_c', 'rinse_sec', 'warm_breath_sec']) {
     const v = clampNum(raw[k], LIMITS[k]);
     if (v !== null) o[k] = v;
   }
+  if (raw.temp_max === null) o.temp_max = null;
+  else { const v = clampNum(raw.temp_max, LIMITS.temp_max); if (v !== null) o.temp_max = v; }
   const g = clampNum(raw.grams_per_100ml, LIMITS.grams_per_100ml, 1);
   if (g !== null) o.grams_per_100ml = g;
   for (const k of ['needs_rinse', 'open_lid_warning']) if (typeof raw[k] === 'boolean') o[k] = raw[k];
-  if (CURVES[raw.curve_type]) o.curve_type = raw.curve_type;
+  if (Array.isArray(raw.steep_times)) {
+    const arr = raw.steep_times.map(x => clampNum(x, LIMITS.steep_sec)).filter(x => x !== null).slice(0, LIMITS.steep_count[1]);
+    if (arr.length) { o.steep_times = arr; o.max_steeps = arr.length; }
+  }
   if (Array.isArray(raw.flavor_tags)) o.flavor_tags = raw.flavor_tags.map(s => String(s).trim()).filter(Boolean).slice(0, 8);
   if (typeof raw.brewing_tip === 'string') o.brewing_tip = raw.brewing_tip.trim().slice(0, 600);
   return o;
 }
 
 function normalizeCustom(raw) {
-  if (!raw || typeof raw.id !== 'string' || !CAT[raw.categoryId]) return null;
+  if (!raw || typeof raw.id !== 'string') return null;
+  const categoryId = LEGACY_CATEGORY[raw.categoryId] || raw.categoryId;
+  if (!CAT[categoryId]) return null;
   const name = String(raw.name_ru || '').trim().slice(0, 80);
   if (!name) return null;
+  // Старый формат (до перехода на таблицы проливов): base_sec/step_sec/curve_type → steep_times
+  const legacy = !Array.isArray(raw.steep_times) && Number.isFinite(Number(raw.base_sec));
   return {
-    ...TEA_DEFAULTS, ...cleanFields(raw),
+    ...TEA_DEFAULTS, ...cleanFields(legacy ? { ...raw, steep_times: legacySteepTimes(raw) } : raw),
     id: raw.id, name_ru: name, name_cn: String(raw.name_cn || '').trim().slice(0, 60),
-    categoryId: raw.categoryId, categoryName: CAT[raw.categoryId].short, custom: true
+    categoryId, categoryName: CAT[categoryId].short, custom: true
   };
 }
 
@@ -1459,7 +2269,7 @@ function rebuildTeas() {
     CATEGORY_COUNTS[t.categoryId] = (CATEGORY_COUNTS[t.categoryId] || 0) + 1;
     const hay = norm([
       t.name_ru, t.name_cn, t.id.replace(/-/g, ' '), t.categoryName, CAT[t.categoryId].short,
-      t.curve_type, CURVES[t.curve_type].label, ...t.flavor_tags, t.brewing_tip
+      ...t.flavor_tags, t.brewing_tip
     ].join(' '));
     SEARCH_INDEX[t.id] = { hay, compact: compactText(hay) };
   }
@@ -1483,7 +2293,6 @@ const state = {
   material: savedSettings.material === 'clay' ? 'clay' : 'porcelain',
   category: 'all',          // 'all' — витрина категорий, иначе id открытой категории
   query: '',
-  curveInfoOpen: false,
   vesselOpen: false,
   favExpanded: false,
   logFilter: { tea: '', rating: '', period: 'all', from: '', to: '' },
@@ -1621,7 +2430,6 @@ function searchTeas(query) {
 
 function teaCardHTML(t) {
   const c = CAT[t.categoryId];
-  const cur = CURVES[t.curve_type];
   const g = calcGrams(t, state.volume, state.material);
   const [main, sub] = splitParen(t.name_ru).map(escapeHtml);
   const sel = t.id === state.selectedId;
@@ -1631,10 +2439,9 @@ function teaCardHTML(t) {
     <div class="tea-item">
       <button type="button" class="tea-card ${sel ? 'selected' : ''}" style="--c:${c.color}"
               data-action="select-tea" data-id="${t.id}" aria-pressed="${sel}">
-        <span class="curve-ico" role="img" title="Кривая экстракции: ${cur.label}" aria-label="Тип кривой: ${cur.label}">${cur.icon}</span>
         <h3 class="serif tea-name">${main}</h3>
         ${sub ? `<span class="tea-sub">${sub}</span>` : ''}
-        <span class="tea-meta mono"><span class="g">${g.toFixed(1)} г</span><span class="sep" aria-hidden="true">·</span><span class="t">${t.temp_c}°C</span>${t.custom ? '<span class="own">свой</span>' : t.modified ? '<span class="own">изменён</span>' : ''}</span>
+        <span class="tea-meta mono"><span class="g">${g.toFixed(1)} г</span><span class="sep" aria-hidden="true">·</span><span class="t">${tempText(t)}°C</span>${t.custom ? '<span class="own">свой</span>' : t.modified ? '<span class="own">изменён</span>' : ''}</span>
       </button>
       <button type="button" class="fav-btn" data-action="toggle-fav" data-id="${t.id}" aria-pressed="${fav}" aria-label="${favLabel}" title="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}">${fav ? ICON.starFill : ICON.star}</button>
     </div>`;
@@ -1790,7 +2597,7 @@ function curveChartHTML(tea, times) {
   times.forEach((s, i) => items.push({ sec: s, label: String(i + 1), dip: i > 0 && s < times[i - 1] }));
   const max = Math.max(...items.map(x => x.sec));
   // √-шкала — чтобы просадки на ранних проливах оставались видны даже рядом с длинными поздними
-  return `<div class="chart" role="img" aria-label="Кривая проливов: ${times.join(', ')} секунд">
+  return `<div class="chart ${items.length > 12 ? 'dense' : ''}" role="img" aria-label="Кривая проливов: ${times.join(', ')} секунд">
     ${items.map((x, i) => {
       const h = Math.max(6, Math.sqrt(x.sec / max) * 100);
       return `<div class="col">
@@ -1811,7 +2618,6 @@ function renderDetail() {
     return;
   }
   const c = CAT[t.categoryId];
-  const cur = CURVES[t.curve_type];
   const g = calcGrams(t, state.volume, state.material);
   const times = generateSteepTimes(t);
   const [main, sub] = splitParen(t.name_ru).map(escapeHtml);
@@ -1821,7 +2627,6 @@ function renderDetail() {
   const total = times.reduce((a, b) => a + b, 0) + (t.needs_rinse ? t.rinse_sec : 0) + t.warm_breath_sec;
   const activeHere = state.session && state.session.teaId === t.id;
   const hasDip = times.some((s, i) => i > 0 && s < times[i - 1]);
-  const open = state.curveInfoOpen;
 
   el.style.setProperty('--c', c.color);
   el.innerHTML = `
@@ -1830,20 +2635,19 @@ function renderDetail() {
       <div class="flex flex-wrap gap-2">
         <span class="badge">${t.categoryName}</span>
         ${t.custom ? '<span class="curve-chip">свой сорт</span>' : t.modified ? '<span class="curve-chip">изменено вами</span>' : ''}
-        <span class="curve-chip">${cur.icon}${cur.label}</span>
       </div>
       <button type="button" class="icon-btn !w-9 !h-9 lg:hidden shrink-0" data-action="close-sheet" aria-label="Закрыть">${ICON.close}</button>
     </div>
 
     <h2 class="serif text-[1.95rem] leading-[1.05] mt-3 font-semibold">${main}</h2>
     ${sub ? `<p class="text-sage text-sm mt-1">${sub}</p>` : ''}
-    <p class="mt-1.5"><span class="hz text-xl" style="color:${c.color}">${hz}</span> <span class="italic text-sage">${py}</span></p>
+    ${hz || py ? `<p class="mt-1.5"><span class="hz text-xl" style="color:${c.color}">${hz}</span> <span class="italic text-sage">${py}</span></p>` : ''}
 
     <div class="dose mt-4">
       <div class="section-label">Дозировка на вашу посуду</div>
       <div class="dose-main">
         <div><span class="dose-k">Отмерьте</span><span class="dose-v mono">${g.toFixed(1)} г</span></div>
-        <div><span class="dose-k">Вода</span><span class="dose-v mono">${t.temp_c}°C</span></div>
+        <div><span class="dose-k">Вода</span><span class="dose-v mono">${tempText(t)}°C</span></div>
       </div>
       <div class="dose-meta">${state.volume} мл · ${MATERIALS[state.material].name} · база ${t.grams_per_100ml.toFixed(1)} г / 100 мл${clay ? ` · <span class="accent">+${CLAY_BONUS} г на поры глины</span>` : ''}</div>
     </div>
@@ -1862,7 +2666,7 @@ function renderDetail() {
     <dl class="specs mt-5" aria-label="Характеристики заваривания">
       <div><dt>Промывка</dt><dd>${t.needs_rinse ? t.rinse_sec + ' с' : '—'}</dd></div>
       <div><dt>Прогрев</dt><dd>${t.warm_breath_sec ? t.warm_breath_sec + ' с' : '—'}</dd></div>
-      <div><dt>Проливы</dt><dd>${t.max_steeps}</dd></div>
+      <div><dt>Проливы</dt><dd>${times.length}</dd></div>
       <div><dt>Время</dt><dd>${fmtDuration(total).replace('≈ ', '')}</dd></div>
     </dl>
     <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1">
@@ -1882,24 +2686,14 @@ function renderDetail() {
 
     <div class="mt-5">
       <div class="flex items-baseline justify-between gap-2">
-        <div class="section-label">Кривая проливов</div>
+        <div class="section-label">Время проливов, с</div>
         <div class="text-[11px] text-dim flex items-center gap-3">
           ${t.needs_rinse ? '<span>П — промывка</span>' : ''}
           ${hasDip ? '<span class="flex items-center gap-1"><span class="legend-sw" style="background:var(--info)"></span>просадка</span>' : ''}
         </div>
       </div>
       ${curveChartHTML(t, times)}
-      <button type="button" class="disclosure" data-action="toggle-curve-info" aria-expanded="${open}" aria-controls="curve-info">
-        <span aria-hidden="true">ⓘ</span><span>Почему меняется время?</span>${ICON.chevron}
-      </button>
-      <div class="disclosure-body" id="curve-info" ${open ? '' : 'hidden'}>${cur.desc}</div>
     </div>`;
-}
-
-function toggleCurveInfo(btn) {
-  state.curveInfoOpen = !state.curveInfoOpen;
-  btn.setAttribute('aria-expanded', String(state.curveInfoOpen));
-  $('#curve-info').hidden = !state.curveInfoOpen;
 }
 
 function selectTea(id) {
@@ -1966,7 +2760,7 @@ function startSession(tea, opts = {}) {
   closeSheet();
   sound.ensure();
   showScreen('session');
-  toast(`Отмерьте ${state.session.grams.toFixed(1)} г и нагрейте воду до ${tea.temp_c}°C`);
+  toast(`Отмерьте ${state.session.grams.toFixed(1)} г и нагрейте воду до ${tempText(tea)}°C`);
 }
 
 function persistSession() {
@@ -2183,7 +2977,7 @@ function stepHint(s, tea) {
   const full = s.remainingMs >= step.sec * 1000;
   if (s.running) return 'Настаивается… За 2 секунды до гонга прозвучит тихий сигнал — берите гайвань в руки.';
   if (!full) return 'Пауза. Продолжите, когда будете готовы.';
-  return `Залейте воду ${tea.temp_c}°C и нажмите «Старт». Сливайте настой по звуку гонга.`;
+  return `Залейте воду ${tempText(tea)}°C и нажмите «Старт». Сливайте настой по звуку гонга.`;
 }
 
 function renderSession() {
@@ -2201,7 +2995,6 @@ function renderSession() {
   }
   const tea = TEA_BY_ID[s.teaId];
   const c = CAT[tea.categoryId];
-  const cur = CURVES[tea.curve_type];
   const step = curStep();
   const [main] = splitParen(tea.name_ru).map(escapeHtml);
   const [hz, py] = splitParen(tea.name_cn).map(escapeHtml);
@@ -2217,13 +3010,13 @@ function renderSession() {
         <div class="min-w-0 flex items-center gap-3">
           <button type="button" class="icon-btn !w-9 !h-9 shrink-0" data-action="tab" data-tab="setup" aria-label="В библиотеку">${ICON.back}</button>
           <div class="min-w-0">
-            <div class="flex items-center gap-2 text-[11px] text-dim"><span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${c.color}"></span>${c.short} · ${cur.label}</div>
+            <div class="flex items-center gap-2 text-[11px] text-dim"><span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${c.color}"></span>${c.short}</div>
             <h2 class="serif text-[1.45rem] sm:text-[1.9rem] leading-tight truncate font-semibold">${main}</h2>
-            <div class="text-[13px] text-sage truncate"><span class="hz text-ink">${hz}</span> <span class="italic">${py}</span></div>
+            ${hz || py ? `<div class="text-[13px] text-sage truncate"><span class="hz text-ink">${hz}</span> <span class="italic">${py}</span></div>` : ''}
           </div>
         </div>
         <div class="text-right shrink-0">
-          <div class="mono text-xl sm:text-2xl accent leading-none">${tea.temp_c}°C</div>
+          <div class="mono text-xl sm:text-2xl accent leading-none">${tempText(tea)}°C</div>
           <div class="mono text-[12px] sm:text-sm text-ink mt-1">${s.grams.toFixed(1)} г · ${s.volume} мл</div>
           <div class="text-[11px] text-sage">${MATERIALS[s.material].name}</div>
         </div>
@@ -2779,11 +3572,10 @@ function openTeaEditor(id, catId) {
           </div>` : ''}
 
           <div class="form-grid">
-            ${num('temp_c', 'Температура', '°C', 1, t.temp_c)}
+            ${num('temp_c', 'Температура от', '°C', 1, t.temp_c)}
+            <div class="fld"><label for="te-temp_max">до (необязательно)</label>
+              <div class="fld-row"><input id="te-temp_max" name="temp_max" type="number" min="60" max="100" step="1" inputmode="numeric" value="${t.temp_max || ''}" class="field mono"><span class="fld-unit">°C</span></div></div>
             ${num('grams_per_100ml', 'Граммовка', 'г / 100 мл', '0.1', t.grams_per_100ml)}
-            ${num('base_sec', '1-й пролив', 'с', 1, t.base_sec)}
-            ${num('step_sec', 'Шаг времени', 'с', 1, t.step_sec)}
-            ${num('max_steeps', 'Проливов', 'шт', 1, t.max_steeps)}
             ${num('warm_breath_sec', 'Прогрев', 'с', 1, t.warm_breath_sec)}
             <div class="fld col-span-2">
               <label class="check"><input type="checkbox" name="needs_rinse" ${t.needs_rinse ? 'checked' : ''}><span>Нужна промывка листа</span></label>
@@ -2791,8 +3583,8 @@ function openTeaEditor(id, catId) {
                 <input id="te-rinse_sec" name="rinse_sec" type="number" min="1" max="60" step="1" inputmode="numeric" value="${t.rinse_sec || 5}" class="field mono" style="width:5rem" ${t.needs_rinse ? '' : 'disabled'}><span class="fld-unit">с</span></div>
             </div>
             <div class="fld col-span-2">
-              <label for="te-curve_type">Кривая экстракции</label>
-              <select id="te-curve_type" name="curve_type" class="field">${Object.entries(CURVES).map(([k, c]) => `<option value="${k}" ${k === t.curve_type ? 'selected' : ''}>${c.label}</option>`).join('')}</select>
+              <label for="te-steep_times">Время проливов, с (через запятую)</label>
+              <input id="te-steep_times" name="steep_times" type="text" inputmode="numeric" class="field mono" value="${t.steep_times.join(', ')}" placeholder="7, 7, 9, 15, 30, 60" autocomplete="off">
             </div>
           </div>
           <label class="check"><input type="checkbox" name="open_lid_warning" ${t.open_lid_warning ? 'checked' : ''}><span>Держать крышку приоткрытой между проливами</span></label>
@@ -2820,16 +3612,19 @@ function openTeaEditor(id, catId) {
   setTimeout(() => { const f = $('#te-name') || $('#te-temp_c'); if (f && window.innerWidth >= 640) f.focus(); }, 80);
 }
 
+function parseSteepList(str) {
+  const parts = String(str).split(/[;,\s]+/).filter(Boolean);
+  const nums = parts.map(p => (/^\d+$/.test(p) ? Number(p) : NaN));
+  return { parts, nums, ok: parts.length > 0 && nums.every(n => n >= LIMITS.steep_sec[0] && n <= LIMITS.steep_sec[1]) && parts.length <= LIMITS.steep_count[1] };
+}
+
 function updateTeaPreview() {
   const form = $('#tea-form');
   if (!form) return;
-  const f = form.elements;
-  const n = k => Number(String(f[k].value).trim().replace(',', '.'));
-  const probe = { curve_type: f.curve_type.value, base_sec: Math.round(n('base_sec')), step_sec: Math.round(n('step_sec')), max_steeps: Math.round(n('max_steeps')) };
-  const ok = probe.base_sec >= LIMITS.base_sec[0] && probe.base_sec <= LIMITS.base_sec[1] &&
-             probe.step_sec >= 0 && probe.step_sec <= LIMITS.step_sec[1] &&
-             probe.max_steeps >= 1 && probe.max_steeps <= LIMITS.max_steeps[1];
-  $('#te-preview').textContent = ok ? 'Кривая: ' + generateSteepTimes(probe).map(fmtSec).join(' · ') : '';
+  const r = parseSteepList(form.elements.steep_times.value);
+  $('#te-preview').textContent = r.ok
+    ? `Проливов: ${r.nums.length} · ${fmtDuration(r.nums.reduce((a, b) => a + b, 0))} на настои`
+    : '';
 }
 
 function saveTeaForm(form) {
@@ -2841,7 +3636,7 @@ function saveTeaForm(form) {
   const rinseOn = f.needs_rinse.checked;
 
   const fields = {};
-  for (const key of Object.keys(LIMITS)) {
+  for (const key of ['temp_c', 'grams_per_100ml', 'warm_breath_sec', 'rinse_sec']) {
     if (key === 'rinse_sec' && !rinseOn) continue;
     const [lo, hi] = LIMITS[key];
     const str = String(f[key].value).trim().replace(',', '.');
@@ -2849,9 +3644,20 @@ function saveTeaForm(form) {
     if (str === '' || !Number.isFinite(v) || v < lo || v > hi) return fail(`${FIELD_LABELS[key]}: введите число от ${lo} до ${hi}`, f[key]);
     fields[key] = key === 'grams_per_100ml' ? Math.round(v * 10) / 10 : Math.round(v);
   }
+  const tmStr = String(f.temp_max.value).trim();
+  if (tmStr === '') fields.temp_max = null;
+  else {
+    const tm = Number(tmStr), [lo, hi] = LIMITS.temp_max;
+    if (!Number.isFinite(tm) || tm < lo || tm > hi) return fail(`${FIELD_LABELS.temp_max}: введите число от ${lo} до ${hi}`, f.temp_max);
+    if (tm < fields.temp_c) return fail('Температура «до» не может быть ниже температуры «от»', f.temp_max);
+    fields.temp_max = tm > fields.temp_c ? Math.round(tm) : null;
+  }
+  const steeps = parseSteepList(f.steep_times.value);
+  if (!steeps.ok) return fail(`Время проливов: от 1 до ${LIMITS.steep_count[1]} целых чисел (секунды, ${LIMITS.steep_sec[0]}–${LIMITS.steep_sec[1]}) через запятую`, f.steep_times);
+  fields.steep_times = steeps.nums;
+  fields.max_steeps = steeps.nums.length;
   fields.needs_rinse = rinseOn;
   fields.open_lid_warning = f.open_lid_warning.checked;
-  fields.curve_type = f.curve_type.value;
   fields.flavor_tags = f.flavor_tags.value.split(/[,;]+/).map(s => s.trim()).filter(Boolean).slice(0, 8);
   fields.brewing_tip = f.brewing_tip.value.trim();
 
@@ -2881,7 +3687,8 @@ function saveTeaForm(form) {
     const orig = TEA_DATABASE.find(x => x.id === id);
     const diff = {};
     for (const [k, v] of Object.entries(fields)) {
-      if (JSON.stringify(v) !== JSON.stringify(orig[k])) diff[k] = v;
+      const nz = x => (x === undefined ? null : x);
+      if (JSON.stringify(nz(v)) !== JSON.stringify(nz(orig[k]))) diff[k] = v;
     }
     if (Object.keys(diff).length) overrides[id] = diff; else delete overrides[id];
     saveOverrides();
@@ -3015,7 +3822,6 @@ document.addEventListener('click', e => {
     case 'open-category':  openCategory(el.dataset.val); break;
     case 'all-categories': showAllCategories(); break;
     case 'toggle-info':    setInfoOpen(!$('#material-info').classList.contains('open')); break;
-    case 'toggle-curve-info': toggleCurveInfo(el); break;
     case 'toggle-vessel':  state.vesselOpen = !state.vesselOpen; updateVesselUI(); break;
     case 'toggle-fav':     toggleFavorite(el.dataset.id); break;
     case 'toggle-fav-all': state.favExpanded = !state.favExpanded; renderCatalog(); break;
