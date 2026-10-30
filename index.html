@@ -645,6 +645,37 @@
   }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+  /* ── Узкие экраны, касание, тост сверху, компактные категории ── */
+  @media (max-width: 399px) {
+    .vessel-line { flex-wrap: wrap; }
+    .vessel-range { flex: 1 1 100%; order: 3; min-width: 0; }
+  }
+  @media (max-width: 899px), (pointer: coarse) {
+    .tab { padding-top: .65rem; padding-bottom: .65rem; }
+    .btn-link { display: inline-flex; align-items: center; min-height: 2.5rem; }
+    .preset { padding: .65rem .8rem; }
+    .seg button { min-height: 2.6rem; }
+    .info-btn { width: 2.5rem; height: 2.5rem; }
+    .vol-field input { padding: .6rem; }
+    .btn-add, .btn-back, .adj { min-height: 2.6rem; }
+    .fav-btn { width: 2.75rem; height: 2.75rem; right: .25rem; bottom: .2rem; }
+    .icon-btn { min-width: 2.5rem; min-height: 2.5rem; }
+  }
+  @media (max-width: 639px) {
+    #toast { bottom: auto; top: calc(4.4rem + env(safe-area-inset-top)); transform: translate(-50%, -16px); }
+    #toast.show { transform: translate(-50%, 0); }
+  }
+  @media (max-width: 459px) {
+    .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+    .cat-card { min-height: 112px; padding: .8rem .85rem; border-radius: 16px; }
+    .cat-card::before { left: .85rem; }
+    .cat-title { font-size: 1.22rem; padding-right: 0; }
+    .cat-desc { padding-right: 0; }
+    .cat-desc-text { display: none; }
+    .cat-glyph { font-size: 4.4rem; bottom: -.75rem; right: .25rem; }
+    .cat-count { margin-bottom: .3rem; }
+  }
+
   /* backwards, а не both: «застывший» transform сделал бы секцию containing block для fixed-шторки */
   .screen-in { animation: screenIn .3s var(--ease) backwards; }
   @keyframes screenIn { from { opacity: 0; transform: translateY(6px); } }
@@ -923,7 +954,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-krasnyy-korall",
     name_ru: "Габа светлый улун Красный коралл",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -934,7 +965,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-vulkanicheskiy",
     name_ru: "Габа светлый улун Вулканический",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -945,7 +976,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-s-dikim-medom",
     name_ru: "Габа светлый улун с диким мёдом",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 1, warm_breath_sec: 30,
@@ -956,7 +987,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-te-guan-in",
     name_ru: "Габа Те Гуань Инь",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -967,7 +998,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-bazalt",
     name_ru: "Габа светлый улун Базальт",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
@@ -978,7 +1009,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-sapfir",
     name_ru: "Габа светлый улун Сапфир",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -989,7 +1020,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-yantar",
     name_ru: "Габа светлый улун Янтарь",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1000,7 +1031,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-zelenaya-yashma",
     name_ru: "Габа светлый улун Зелёная Яшма",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1011,7 +1042,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-zolotaya",
     name_ru: "Габа светлый улун Золотая",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1022,7 +1053,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-alishan",
     name_ru: "Габа светлый улун Алишань",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1033,7 +1064,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-diabaz",
     name_ru: "Габа светлый улун Диабаз",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1044,7 +1075,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-izumrud",
     name_ru: "Габа светлый улун Изумруд",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1055,7 +1086,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-svetlyy-ulun-korol",
     name_ru: "Габа светлый улун Король",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 85, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
@@ -1066,7 +1097,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-da-khun-pao-vulkanicheskiy",
     name_ru: "Габа Да Хун Пао Вулканический",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 90, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1077,7 +1108,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-shu-puer",
     name_ru: "Габа Шу Пуэр",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 100, grams_per_100ml: 6.7,
     needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
@@ -1088,7 +1119,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-belyy-chay-shou-mey",
     name_ru: "Габа Белый Чай Шоу Мэй",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 80, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
@@ -1099,7 +1130,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-belyy-chay-kimberlit",
     name_ru: "Габа Белый Чай Кимберлит",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 80, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 5, warm_breath_sec: 30,
@@ -1110,7 +1141,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-shen-puer",
     name_ru: "Габа Шэн Пуэр",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 80, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 7, warm_breath_sec: 30,
@@ -1121,7 +1152,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-shen-puer-datsit",
     name_ru: "Габа Шэн Пуэр Дацит",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 80, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 4, warm_breath_sec: 30,
@@ -1132,7 +1163,7 @@ const TEA_DATABASE = [
   {
     id: "gaba_tea-gaba-krasnyy-chay-obsidian",
     name_ru: "Габа Красный чай Обсидиан",
-    name_cn: "",
+    name_cn: "佳叶龙茶 (Jiāyè Lóngchá)",
     categoryId: "gaba_tea", categoryName: "Габа чай",
     temp_c: 90, grams_per_100ml: 5.0,
     needs_rinse: true, rinse_sec: 3, warm_breath_sec: 30,
@@ -1808,7 +1839,7 @@ const TEA_DATABASE = [
   {
     id: "shu_puer-dvortsovyy-zolotoy-buton-2014-g",
     name_ru: "Дворцовый Золотой Бутон (2014 г.)",
-    name_cn: "",
+    name_cn: "宫廷金芽 (Gōngtíng Jīnyá)",
     categoryId: "shu_puer", categoryName: "Шу Пуэр",
     temp_c: 100, grams_per_100ml: 6.7,
     needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
@@ -1885,7 +1916,7 @@ const TEA_DATABASE = [
   {
     id: "shu_puer-golden-bud-100gr-2009-g",
     name_ru: "Золотой Бутон (2009 г.)",
-    name_cn: "",
+    name_cn: "金芽 (Jīnyá)",
     categoryId: "shu_puer", categoryName: "Шу Пуэр",
     temp_c: 100, grams_per_100ml: 6.7,
     needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
@@ -1929,7 +1960,7 @@ const TEA_DATABASE = [
   {
     id: "shu_puer-korolevskiy-ban-chzhan-2020-g",
     name_ru: "Королевский Бань Чжань (2020 г.)",
-    name_cn: "",
+    name_cn: "班章 (Bānzhāng)",
     categoryId: "shu_puer", categoryName: "Шу Пуэр",
     temp_c: 100, grams_per_100ml: 6.7,
     needs_rinse: true, rinse_sec: 10, warm_breath_sec: 30,
@@ -1940,7 +1971,7 @@ const TEA_DATABASE = [
   {
     id: "shu_puer-mini-to-cha-ban-chzhan-2019-g",
     name_ru: "Мини То Ча Бань Чжань (2019 г.)",
-    name_cn: "",
+    name_cn: "班章沱茶 (Bānzhāng Tuóchá)",
     categoryId: "shu_puer", categoryName: "Шу Пуэр",
     temp_c: 100, grams_per_100ml: 6.7,
     needs_rinse: true, rinse_sec: 15, warm_breath_sec: 30,
@@ -2286,6 +2317,7 @@ function loadLog() {
     .map(e => ({ categoryId: '', material: 'porcelain', steepsDone: 0, totalSteeps: e.steepTimes.length, adjustTotal: 0, rating: 0, qi: [], note: '', date: new Date(0).toISOString(), ...e }));
 }
 
+const LOG_PAGE = 50;   // записей дневника за один показ
 const savedSettings = store.get(KEYS.settings, {});
 const state = {
   screen: 'setup',
@@ -2296,7 +2328,8 @@ const state = {
   vesselOpen: false,
   favExpanded: false,
   logFilter: { tea: '', rating: '', period: 'all', from: '', to: '' },
-  selectedId: TEA_BY_ID[savedSettings.selectedId] ? savedSettings.selectedId : TEAS[0].id,
+  logLimit: LOG_PAGE,
+  selectedId: TEA_BY_ID[savedSettings.selectedId] ? savedSettings.selectedId : (TEAS.find(t => t.categoryId === CATEGORIES[0].id) || TEAS[0]).id,
   session: null,
   log: loadLog(),
   modal: null
@@ -2324,7 +2357,8 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 function norm(s) {
-  return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ё/g, 'е');
+  // нижний регистр, без диакритики; ё=е=э, ь/ъ отбрасываются: «шен»=«шэн», «хуан»=«хуань», «дан»=«дань»
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[её]/g, 'е').replace(/э/g, 'е').replace(/[ьъ]/g, '');
 }
 /** «Шу Пуэр (Прессованный блин)» → ['Шу Пуэр', 'Прессованный блин'] */
 function splitParen(s) {
@@ -2494,7 +2528,7 @@ function categoryCardHTML(c) {
       <span class="cat-glyph hz" aria-hidden="true">${c.glyph}</span>
       <span class="cat-count mono">${hasSel ? '<span class="cat-dot" title="Здесь выбранный сорт"></span>' : ''}${sortsLabel(n)}</span>
       <span class="cat-title serif">${c.short}</span>
-      <span class="cat-desc">${c.desc} · <span class="mono">${c.temp}</span></span>
+      <span class="cat-desc"><span class="cat-desc-text">${c.desc} · </span><span class="mono">${c.temp}</span></span>
     </button>`;
 }
 
@@ -2581,6 +2615,7 @@ function openCategory(id) {
   if (top < 70) window.scrollBy({ top: top - 80 });
   const back = $('#catalog .btn-back');
   if (back) back.focus({ preventScroll: true });
+  syncHistory();
 }
 
 function showAllCategories() {
@@ -2589,6 +2624,7 @@ function showAllCategories() {
   renderCatalog();
   const card = $(`#catalog .cat-card[data-val="${from}"]`);
   if (card) card.focus({ preventScroll: true });
+  syncHistory();
 }
 
 function curveChartHTML(tea, times) {
@@ -3433,6 +3469,7 @@ function renderLogBody() {
   $('#lf-reset').hidden = !active;
   $('#lf-dates').hidden = f.period !== 'custom';
   const list = filteredLog().sort(byDateDesc);
+  const shown = list.slice(0, state.logLimit);
   if (!list.length) {
     body.innerHTML = `
       <div class="empty panel mt-5">
@@ -3448,9 +3485,10 @@ function renderLogBody() {
     ${statsHTML(logStats(list))}
     <div class="mt-7 flex items-baseline justify-between gap-3">
       <h3 class="section-label">Записи</h3>
-      <span class="text-[12px] text-dim mono" aria-live="polite">${list.length} из ${state.log.length}</span>
+      <span class="text-[12px] text-dim mono" aria-live="polite">${shown.length < list.length ? `${shown.length} из ${list.length}` : `${list.length} из ${state.log.length}`}</span>
     </div>
-    <div class="mt-3 space-y-3">${list.map(logEntryHTML).join('')}</div>`;
+    <div class="mt-3 space-y-3">${shown.map(logEntryHTML).join('')}</div>
+    ${shown.length < list.length ? `<button type="button" class="btn-ghost w-full mt-4" data-action="log-more">Показать ещё ${Math.min(LOG_PAGE, list.length - shown.length)}</button>` : ''}`;
 }
 
 function onLogFilterChange(el) {
@@ -3460,11 +3498,13 @@ function onLogFilterChange(el) {
   else if (el.id === 'lf-period') { f.period = el.value; if (f.period !== 'custom') { f.from = ''; f.to = ''; } }
   else if (el.id === 'lf-from') f.from = el.value;
   else if (el.id === 'lf-to') f.to = el.value;
+  state.logLimit = LOG_PAGE;
   renderLogBody();
 }
 
 function resetLogFilter() {
   state.logFilter = emptyLogFilter();
+  state.logLimit = LOG_PAGE;
   renderLog();
   const first = $('#lf-tea');
   if (first) first.focus({ preventScroll: true });
@@ -3751,10 +3791,70 @@ function showScreen(name) {
   $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
   if (name !== 'setup') closeSheet();
   if (name === 'session') renderSession();
-  if (name === 'log') renderLog();
+  if (name === 'log') { state.logLimit = LOG_PAGE; renderLog(); }
   if (name === 'setup') renderDetail();
   window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
   updateNav();
+  syncHistory();
+}
+
+/* ── История браузера: «Назад» ведёт на предыдущий экран сайта, а не уводит с него ──
+   В истории хранятся только экран и открытая категория. Шторка деталей и окна закрываются кнопкой «Назад»,
+   не меняя экран. Под стартовым видом лежит служебная запись (base), чтобы «Назад» можно было перехватить. */
+const viewKey = v => `${v.screen}|${v.category}`;
+const currentView = () => ({ screen: state.screen, category: state.category });
+const viewHash = v => '#' + (v.screen === 'setup' ? (v.category !== 'all' ? 'cat-' + v.category : '') : v.screen);
+const viewUrl = v => (viewHash(v) === '#' ? location.pathname + location.search : viewHash(v));
+let historyReady = false, restoringView = false, skipPops = 0;
+
+function syncHistory() {
+  if (!historyReady || restoringView) return;
+  const v = currentView(), cur = history.state;
+  if (cur && !cur.base && viewKey(cur) === viewKey(v)) return;
+  try { history.pushState(v, '', viewUrl(v)); } catch { /* file:// и т. п. */ }
+}
+
+const overlaysOpen = () => !!state.modal || $('#detail').classList.contains('open');
+function closeOverlays() {
+  if (state.modal) closeModal();
+  if ($('#detail').classList.contains('open')) closeSheet();
+}
+
+function applyView(v) {
+  let screen = ['setup', 'session', 'log'].includes(v.screen) ? v.screen : 'setup';
+  if (screen === 'session' && !state.session) screen = 'setup';
+  state.category = CAT[v.category] ? v.category : 'all';
+  showScreen(screen);
+  if (screen === 'setup') renderCatalog();
+}
+
+window.addEventListener('popstate', e => {
+  if (skipPops > 0) { skipPops--; return; }
+  if (overlaysOpen()) {                       // «Назад» сначала закрывает шторку/окно и остаётся на экране
+    closeOverlays();
+    skipPops = 1;
+    setTimeout(() => { skipPops = 0; }, 500);
+    history.forward();
+    return;
+  }
+  const st = e.state;
+  if (!st) return;
+  restoringView = true;
+  try { applyView(st); } finally { restoringView = false; }
+  if (st.base) history.back();                // дошли до самой первой записи — выходим с сайта
+});
+
+function initHistory() {
+  try {
+    const h = location.hash.slice(1);
+    if (h.startsWith('cat-') && CAT[h.slice(4)]) { state.category = h.slice(4); renderCatalog(); }
+    else if (h === 'log') showScreen('log');
+    else if (h === 'session' && state.session) showScreen('session');
+    const v = currentView();
+    history.replaceState({ ...v, base: true }, '', viewUrl(v));
+    history.pushState(v, '', viewUrl(v));
+    historyReady = true;
+  } catch { /* история недоступна — «Назад» работает как обычно */ }
 }
 
 /* Экран не гаснет, пока идёт отсчёт (Screen Wake Lock) */
@@ -3859,6 +3959,7 @@ document.addEventListener('click', e => {
       break;
     case 'log-delete':     deleteLogEntry(el.dataset.id); break;
     case 'log-repeat':     repeatLogEntry(el.dataset.id); break;
+    case 'log-more': { const y = window.scrollY; state.logLimit += LOG_PAGE; renderLogBody(); window.scrollTo({ top: y, behavior: 'instant' }); break; }
   }
 });
 
@@ -3915,6 +4016,7 @@ renderCatalog();
 renderDetail();
 updateMuteBtn();
 updateNav();
+initHistory();
 setInterval(tick, 50);
 /* Офлайн-режим: service worker кэширует приложение, шрифты и стили */
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
