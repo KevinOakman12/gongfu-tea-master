@@ -1,7 +1,7 @@
 /* 茶道 ChaDao — service worker (офлайн).
    HTML/CSS/манифест: сначала сеть (свежая версия), при её отсутствии — кэш.
    Шрифты и иконки: из кэша. При изменении состава файлов поднимайте VERSION. */
-const VERSION = 'v7';
+const VERSION = 'v8';
 const CACHE = 'gongfu-' + VERSION;
 const ASSETS = [
   "./",
