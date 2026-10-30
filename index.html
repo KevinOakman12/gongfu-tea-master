@@ -764,15 +764,15 @@
    ════════════════════════════════════════════════════════════════════ */
 const CATEGORIES = [
   { id: 'green_tea',    short: 'Зелёный чай',    color: 'var(--tea-green)',        bg: 'var(--tea-green-bg)',        glyph: '绿', desc: 'Свежие, травянистые и деликатные' },
-  { id: 'red_tea',      short: 'Красный чай',    color: 'var(--tea-red)',          bg: 'var(--tea-red-bg)',          glyph: '红', desc: 'Медовые, фруктовые и согревающие' },
-  { id: 'oolong_light', short: 'Светлый улун',   color: 'var(--tea-light-oolong)', bg: 'var(--tea-light-oolong-bg)', glyph: '清', desc: 'Цветочные, сливочные и свежие' },
-  { id: 'shu_puer',     short: 'Шу Пуэр',        color: 'var(--tea-puer)',         bg: 'var(--tea-puer-bg)',         glyph: '熟', desc: 'Густые, землистые и тёмные' },
   { id: 'white_tea',    short: 'Белый чай',      color: 'var(--tea-white)',        bg: 'var(--tea-white-bg)',        glyph: '白', desc: 'Нежные, воздушные и постепенно раскрывающиеся' },
+  { id: 'yellow_tea',   short: 'Жёлтый чай',     color: 'var(--tea-yellow)',       bg: 'var(--tea-yellow-bg)',       glyph: '黄', desc: 'Мягкие, томлёные и ореховые' },
+  { id: 'oolong_light', short: 'Светлый улун',   color: 'var(--tea-light-oolong)', bg: 'var(--tea-light-oolong-bg)', glyph: '清', desc: 'Цветочные, сливочные и свежие' },
   { id: 'oolong_dark',  short: 'Тёмный улун',    color: 'var(--tea-dark-oolong)',  bg: 'var(--tea-dark-oolong-bg)',  glyph: '岩', desc: 'Прожаренные, минеральные и пряные' },
-  { id: 'sheng_puer',   short: 'Шэн Пуэр',       color: 'var(--tea-sheng)',        bg: 'var(--tea-sheng-bg)',        glyph: '生', desc: 'Яркие, терпкие и раскрывающиеся с годами' },
   { id: 'gaba_tea',     short: 'Габа чай',       color: 'var(--tea-gaba)',         bg: 'var(--tea-gaba-bg)',         glyph: '佳', desc: 'Сладкие, ягодные и мягкие' },
-  { id: 'hei_cha',      short: 'Хэй Ча',         color: 'var(--tea-hei)',          bg: 'var(--tea-hei-bg)',          glyph: '黑', desc: 'Глубокие, древесные и мягкие' },
-  { id: 'yellow_tea',   short: 'Жёлтый чай',     color: 'var(--tea-yellow)',       bg: 'var(--tea-yellow-bg)',       glyph: '黄', desc: 'Мягкие, томлёные и ореховые' }
+  { id: 'red_tea',      short: 'Красный чай',    color: 'var(--tea-red)',          bg: 'var(--tea-red-bg)',          glyph: '红', desc: 'Медовые, фруктовые и согревающие' },
+  { id: 'sheng_puer',   short: 'Шэн Пуэр',       color: 'var(--tea-sheng)',        bg: 'var(--tea-sheng-bg)',        glyph: '生', desc: 'Яркие, терпкие и раскрывающиеся с годами' },
+  { id: 'shu_puer',     short: 'Шу Пуэр',        color: 'var(--tea-puer)',         bg: 'var(--tea-puer-bg)',         glyph: '熟', desc: 'Густые, землистые и тёмные' },
+  { id: 'hei_cha',      short: 'Хэй Ча',         color: 'var(--tea-hei)',          bg: 'var(--tea-hei-bg)',          glyph: '黑', desc: 'Глубокие, древесные и мягкие' }
 ];
 const CAT = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 
@@ -2029,7 +2029,7 @@ const MATERIALS = {
   porcelain: { name: 'Фарфор / Стекло', note: 'Гайвань: нейтральная теплоотдача — базовые параметры без изменений.' },
   clay:      { name: 'Исинская глина',  note: 'Толстые пористые стенки долго держат жар. +0.5 г к навеске: поры глины забирают часть аромата.' }
 };
-const CLAY_WARNING = 'Глина слишком долго держит жар! Для зеленых и белых чаев лучше взять фарфор или не закрывать крышку';
+const CLAY_WARNING = 'Глина слишком долго держит жар! Для чая с водой до 85°C лучше взять фарфор или не закрывать крышку';
 const LID_WARNING = 'Держите крышку гайвани приоткрытой между проливами';
 const MIN_STEEP_SEC = 3;
 
